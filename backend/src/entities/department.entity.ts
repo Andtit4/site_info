@@ -1,6 +1,7 @@
-import { Entity, Column, PrimaryGeneratedColumn, OneToMany, ManyToMany } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, OneToMany, ManyToMany, JoinTable } from 'typeorm';
 import { Equipment } from './equipment.entity';
 import { Team } from '../teams/entities/team.entity';
+import { EquipmentType } from './equipment.entity';
 
 // Types de départements
 export enum DepartmentType {
@@ -45,6 +46,9 @@ export class Department {
 
   @OneToMany(() => Equipment, equipment => equipment.department)
   equipment: Equipment[];
+
+  @Column('simple-array', { nullable: true })
+  managedEquipmentTypes: EquipmentType[];
 
   @Column({ default: () => 'CURRENT_TIMESTAMP' })
   createdAt: Date;

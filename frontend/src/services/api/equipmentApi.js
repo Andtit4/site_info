@@ -34,7 +34,7 @@ const equipmentApi = {
 
   async update(id, equipmentData) {
     try {
-      const response = await axios.put(`${API_URL}/equipment/${id}`, equipmentData)
+      const response = await axios.patch(`${API_URL}/equipment/${id}`, equipmentData)
       return response.data
     } catch (error) {
       console.error(`Erreur lors de la mise à jour de l'équipement ${id}:`, error)

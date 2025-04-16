@@ -1,5 +1,6 @@
-import { IsString, IsOptional, IsBoolean, IsEmail, IsNotEmpty, IsEnum } from 'class-validator';
+import { IsString, IsOptional, IsBoolean, IsEmail, IsNotEmpty, IsEnum, IsArray } from 'class-validator';
 import { DepartmentType } from '../entities/department.entity';
+import { EquipmentType } from '../entities/equipment.entity';
 
 export class CreateDepartmentDto {
   @IsString()
@@ -29,6 +30,11 @@ export class CreateDepartmentDto {
   @IsBoolean()
   @IsOptional()
   isActive?: boolean = true;
+  
+  @IsArray()
+  @IsEnum(EquipmentType, { each: true })
+  @IsOptional()
+  managedEquipmentTypes?: EquipmentType[];
 }
 
 export class UpdateDepartmentDto {
@@ -59,6 +65,11 @@ export class UpdateDepartmentDto {
   @IsBoolean()
   @IsOptional()
   isActive?: boolean;
+  
+  @IsArray()
+  @IsEnum(EquipmentType, { each: true })
+  @IsOptional()
+  managedEquipmentTypes?: EquipmentType[];
 }
 
 export class DepartmentFilterDto {
@@ -73,4 +84,8 @@ export class DepartmentFilterDto {
   @IsBoolean()
   @IsOptional()
   isActive?: boolean;
+  
+  @IsEnum(EquipmentType)
+  @IsOptional()
+  managesEquipmentType?: EquipmentType;
 } 

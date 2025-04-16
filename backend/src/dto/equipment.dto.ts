@@ -45,6 +45,10 @@ export class CreateEquipmentDto {
   @IsString()
   @IsOptional()
   departmentId?: string;
+
+  @IsString()
+  @IsOptional()
+  teamId?: string;
 }
 
 export class UpdateEquipmentDto {
@@ -87,6 +91,10 @@ export class UpdateEquipmentDto {
   @IsString()
   @IsOptional()
   departmentId?: string;
+
+  @IsString()
+  @IsOptional()
+  teamId?: string;
 }
 
 export class EquipmentFilterDto {

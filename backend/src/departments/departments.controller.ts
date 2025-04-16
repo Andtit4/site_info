@@ -2,6 +2,7 @@ import { Controller, Get, Post, Body, Param, Delete, Put, Query, UsePipes, Valid
 import { DepartmentsService } from './departments.service';
 import { CreateDepartmentDto, UpdateDepartmentDto, DepartmentFilterDto } from '../dto/department.dto';
 import { Department } from '../entities/department.entity';
+import { EquipmentType } from '../entities/equipment.entity';
 
 @Controller('departments')
 export class DepartmentsController {
@@ -22,6 +23,12 @@ export class DepartmentsController {
   @Get('statistics')
   getStatistics() {
     return this.departmentsService.getStatistics();
+  }
+
+  @Get('equipment-type/:type')
+  findByEquipmentType(@Param('type') type: EquipmentType): Promise<Department[]> {
+    const filterDto: DepartmentFilterDto = { managesEquipmentType: type };
+    return this.departmentsService.findAll(filterDto);
   }
 
   @Get(':id')

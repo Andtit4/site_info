@@ -30,6 +30,16 @@ const departmentsApi = {
     }
   },
 
+  async getByEquipmentType(equipmentType) {
+    try {
+      const response = await axios.get(`${API_URL}/departments/equipment-type/${equipmentType}`)
+      return response.data
+    } catch (error) {
+      console.error(`Erreur lors de la récupération des départements pour le type d'équipement ${equipmentType}:`, error)
+      throw error
+    }
+  },
+
   async create(departmentData) {
     try {
       const response = await axios.post(`${API_URL}/departments`, departmentData)

@@ -3,6 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, Like } from 'typeorm';
 import { Department } from '../entities/department.entity';
 import { CreateDepartmentDto, UpdateDepartmentDto, DepartmentFilterDto } from '../dto/department.dto';
+import { EquipmentType } from '../entities/equipment.entity';
 
 @Injectable()
 export class DepartmentsService {
@@ -24,9 +25,25 @@ export class DepartmentsService {
         throw new ConflictException(`Un département avec le nom '${createDepartmentDto.name}' existe déjà`);
       }
 
+      // Convertir le tableau en chaîne pour le stockage
+      if (createDepartmentDto.managedEquipmentTypes && Array.isArray(createDepartmentDto.managedEquipmentTypes)) {
+        (createDepartmentDto as any).managedEquipmentTypes = createDepartmentDto.managedEquipmentTypes.join(',');
+      }
+
       const department = this.departmentsRepository.create(createDepartmentDto);
       this.logger.log(`Création d'un nouveau département: ${department.name}`);
-      return this.departmentsRepository.save(department);
+      
+      const savedDepartment = await this.departmentsRepository.save(department);
+      
+      // Reconvertir la chaîne en tableau pour la réponse
+      if (savedDepartment.managedEquipmentTypes && typeof savedDepartment.managedEquipmentTypes === 'string') {
+        savedDepartment.managedEquipmentTypes = (savedDepartment.managedEquipmentTypes as string)
+          .split(',')
+          .filter(type => type) // Filtrer les valeurs vides
+          .map(type => type as EquipmentType); // Convertir en type EquipmentType
+      }
+      
+      return savedDepartment;
     } catch (error) {
       this.logger.error(`Erreur lors de la création du département: ${error.message}`, error.stack);
       throw error;
@@ -35,7 +52,7 @@ export class DepartmentsService {
 
   async findAll(filterDto: DepartmentFilterDto = {}): Promise<Department[]> {
     try {
-      const { type, isActive, search } = filterDto;
+      const { type, isActive, search, managesEquipmentType } = filterDto;
       const query = this.departmentsRepository.createQueryBuilder('department');
 
       if (type) {
@@ -52,6 +69,10 @@ export class DepartmentsService {
           { search: `%${search}%` },
         );
       }
+      
+      if (managesEquipmentType) {
+        query.andWhere('department.managedEquipmentTypes LIKE :equipType', { equipType: `%${managesEquipmentType}%` });
+      }
 
       query
         .select([
@@ -63,6 +84,7 @@ export class DepartmentsService {
           'department.contactEmail',
           'department.contactPhone',
           'department.isActive',
+          'department.managedEquipmentTypes',
           'department.createdAt',
           'department.updatedAt'
         ])
@@ -70,6 +92,17 @@ export class DepartmentsService {
         .leftJoinAndSelect('department.teams', 'teams');
 
       const departments = await query.getMany();
+      
+      // Conversion des chaînes managedEquipmentTypes en tableaux
+      departments.forEach(department => {
+        if (department.managedEquipmentTypes && typeof department.managedEquipmentTypes === 'string') {
+          department.managedEquipmentTypes = (department.managedEquipmentTypes as string)
+            .split(',')
+            .filter(type => type) // Filtrer les valeurs vides
+            .map(type => type as EquipmentType); // Convertir en type EquipmentType
+        }
+      });
+      
       this.logger.log(`Récupération de ${departments.length} départements`);
       return departments;
     } catch (error) {
@@ -87,6 +120,14 @@ export class DepartmentsService {
 
       if (!department) {
         throw new NotFoundException(`Département avec ID "${id}" non trouvé`);
+      }
+      
+      // Conversion des chaînes managedEquipmentTypes en tableaux
+      if (department.managedEquipmentTypes && typeof department.managedEquipmentTypes === 'string') {
+        department.managedEquipmentTypes = (department.managedEquipmentTypes as string)
+          .split(',')
+          .filter(type => type) // Filtrer les valeurs vides
+          .map(type => type as EquipmentType); // Convertir en type EquipmentType
       }
 
       return department;
@@ -110,10 +151,26 @@ export class DepartmentsService {
           throw new ConflictException(`Un département avec le nom '${updateDepartmentDto.name}' existe déjà`);
         }
       }
+      
+      // Convertir le tableau en chaîne pour le stockage
+      if (updateDepartmentDto.managedEquipmentTypes && Array.isArray(updateDepartmentDto.managedEquipmentTypes)) {
+        (updateDepartmentDto as any).managedEquipmentTypes = updateDepartmentDto.managedEquipmentTypes.join(',');
+      }
 
       Object.assign(department, updateDepartmentDto);
       this.logger.log(`Mise à jour du département: ${department.name}`);
-      return this.departmentsRepository.save(department);
+      
+      const savedDepartment = await this.departmentsRepository.save(department);
+      
+      // Reconvertir la chaîne en tableau pour la réponse
+      if (savedDepartment.managedEquipmentTypes && typeof savedDepartment.managedEquipmentTypes === 'string') {
+        savedDepartment.managedEquipmentTypes = (savedDepartment.managedEquipmentTypes as string)
+          .split(',')
+          .filter(type => type) // Filtrer les valeurs vides
+          .map(type => type as EquipmentType); // Convertir en type EquipmentType
+      }
+      
+      return savedDepartment;
     } catch (error) {
       this.logger.error(`Erreur lors de la mise à jour du département ${id}: ${error.message}`, error.stack);
       throw error;

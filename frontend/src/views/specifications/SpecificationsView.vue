@@ -242,7 +242,7 @@ export default {
       selectedSpecification.value = spec;
       form.value = {
         equipmentType: spec.equipmentType,
-        columns: spec.columns
+        columns: spec.columns || []
       };
       showModal.value = true;
     };
@@ -259,11 +259,16 @@ export default {
           return;
         }
 
+        const payload = {
+          equipmentType: form.value.equipmentType,
+          columns: form.value.columns
+        };
+
         if (isEditing.value && selectedSpecification.value) {
-          await specificationsApi.update(selectedSpecification.value.id, form.value);
+          await specificationsApi.update(selectedSpecification.value.id, payload);
           toast.success('Spécifications mises à jour avec succès');
         } else {
-          await specificationsApi.create(form.value);
+          await specificationsApi.create(payload);
           toast.success('Spécifications créées avec succès');
         }
 

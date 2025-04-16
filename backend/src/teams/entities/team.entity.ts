@@ -1,6 +1,7 @@
 import { Entity, Column, PrimaryColumn, ManyToOne, JoinColumn, OneToMany, ManyToMany, JoinTable } from 'typeorm';
 import { Department } from '../../entities/department.entity';
 import { Site } from '../../entities/site.entity';
+import { Equipment } from '../../entities/equipment.entity';
 import { EquipmentType } from '../../entities/equipment.entity';
 
 export enum TeamStatus {
@@ -81,4 +82,7 @@ export class Team {
     },
   })
   sites: Site[];
+
+  @ManyToMany(() => Equipment, equipment => equipment.teams)
+  equipment: Equipment[];
 } 

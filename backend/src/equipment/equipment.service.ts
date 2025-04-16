@@ -5,6 +5,7 @@ import { Equipment, EquipmentType, EquipmentStatus } from '../entities/equipment
 import { CreateEquipmentDto, UpdateEquipmentDto, EquipmentFilterDto } from '../dto/equipment.dto';
 import { SitesService } from '../sites/sites.service';
 import { DepartmentsService } from '../departments/departments.service';
+import { TeamsService } from '../teams/teams.service';
 
 @Injectable()
 export class EquipmentService {
@@ -13,6 +14,7 @@ export class EquipmentService {
     private equipmentRepository: Repository<Equipment>,
     private sitesService: SitesService,
     private departmentsService: DepartmentsService,
+    private teamsService: TeamsService,
   ) {}
 
   async findAll(filterDto: EquipmentFilterDto = {}): Promise<Equipment[]> {
@@ -59,12 +61,16 @@ export class EquipmentService {
 
   async create(createEquipmentDto: CreateEquipmentDto): Promise<Equipment> {
     // Verifier si le site existe
-    // 
     await this.sitesService.findOne(createEquipmentDto.siteId);
     
     // Verifier si le departement existe (si specifie)
     if (createEquipmentDto.departmentId) {
       await this.departmentsService.findOne(createEquipmentDto.departmentId);
+    }
+
+    // Verifier si l'equipe existe (si specifiee)
+    if (createEquipmentDto.teamId) {
+      await this.teamsService.findOne(createEquipmentDto.teamId);
     }
 
     // Verifier si un equipement avec cet ID existe dejà
@@ -97,10 +103,15 @@ export class EquipmentService {
       await this.departmentsService.findOne(updateEquipmentDto.departmentId);
     }
 
+    // Verifier si l'equipe existe (si specifiee)
+    if (updateEquipmentDto.teamId) {
+      await this.teamsService.findOne(updateEquipmentDto.teamId);
+    }
+
     // Mettre à jour les proprietes
     Object.assign(equipment, updateEquipmentDto);
     
-    // Sauvegarder les modifications
+    // Sauvegarder et retourner l'equipement
     return this.equipmentRepository.save(equipment);
   }
 

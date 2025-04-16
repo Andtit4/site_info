@@ -1,6 +1,7 @@
 import { Entity, Column, PrimaryColumn, ManyToOne, JoinColumn, ManyToMany, JoinTable } from 'typeorm';
 import { Site } from './site.entity';
 import { Department } from './department.entity';
+import { Team } from '../teams/entities/team.entity';
 
 // Types d'équipement possibles
 export enum EquipmentType {
@@ -74,4 +75,18 @@ export class Equipment {
 
   @Column({ nullable: true })
   departmentId: string;
+
+  @ManyToMany(() => Team, team => team.equipment)
+  @JoinTable({
+    name: 'team_equipment',
+    joinColumn: {
+      name: 'equipmentId',
+      referencedColumnName: 'id',
+    },
+    inverseJoinColumn: {
+      name: 'teamId',
+      referencedColumnName: 'id',
+    },
+  })
+  teams: Team[];
 } 

@@ -18,35 +18,42 @@
     </div>
 
     <!-- Filtres -->
-    <div class="mt-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-      <div class="flex-1 min-w-0">
-        <div class="relative rounded-md shadow-sm">
+    <div class="sm:flex sm:justify-between">
+      <div class="flex flex-col gap-4 sm:flex-row sm:items-center">
+        <div class="relative max-w-xs">
           <input
             type="text"
             v-model="filters.search"
-            class="block w-full rounded-md border-gray-300 dark:border-gray-600 pr-10 focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm dark:bg-gray-700 dark:text-white"
-            placeholder="Rechercher un département..."
+            placeholder="Rechercher..."
+            class="block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm dark:bg-gray-700 dark:text-white pr-10"
           />
           <div class="absolute inset-y-0 right-0 flex items-center pr-3">
-            <MagnifyingGlassIcon class="h-5 w-5 text-gray-400" aria-hidden="true" />
+            <MagnifyingGlassIcon class="h-5 w-5 text-gray-400" />
           </div>
         </div>
-      </div>
-      <div class="flex gap-4">
         <select
           v-model="filters.type"
-          class="block w-full rounded-md border-gray-300 dark:border-gray-600 py-2 pl-3 pr-10 text-base focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 sm:text-sm dark:bg-gray-700 dark:text-white"
+          class="mt-1 sm:mt-0 block w-full sm:w-auto rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm dark:bg-gray-700 dark:text-white"
         >
-          <option value="">Tous les types</option>
+          <option value="">Type - Tous</option>
           <option v-for="type in departmentTypes" :key="type" :value="type">
             {{ getTypeLabel(type) }}
           </option>
         </select>
         <select
-          v-model="filters.isActive"
-          class="block w-full rounded-md border-gray-300 dark:border-gray-600 py-2 pl-3 pr-10 text-base focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 sm:text-sm dark:bg-gray-700 dark:text-white"
+          v-model="filters.managesEquipmentType"
+          class="mt-1 sm:mt-0 block w-full sm:w-auto rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm dark:bg-gray-700 dark:text-white"
         >
-          <option value="">Tous les statuts</option>
+          <option value="">Gère - Tous les équipements</option>
+          <option v-for="type in equipmentTypes" :key="type" :value="type">
+            {{ getEquipmentTypeLabel(type) }}
+          </option>
+        </select>
+        <select
+          v-model="filters.isActive"
+          class="mt-1 sm:mt-0 block w-full sm:w-auto rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm dark:bg-gray-700 dark:text-white"
+        >
+          <option value="">Statut - Tous</option>
           <option :value="true">Actif</option>
           <option :value="false">Inactif</option>
         </select>
@@ -85,6 +92,18 @@
             <div>
               <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Contact</dt>
               <dd class="mt-1 text-sm text-gray-900 dark:text-white">{{ department.contactEmail }}</dd>
+            </div>
+            <div v-if="department.managedEquipmentTypes && department.managedEquipmentTypes.length > 0" class="col-span-2">
+              <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Types d'équipement gérés</dt>
+              <dd class="mt-1 flex flex-wrap gap-1">
+                <span
+                  v-for="type in department.managedEquipmentTypes"
+                  :key="type"
+                  class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-800 dark:text-blue-100"
+                >
+                  {{ getEquipmentTypeLabel(type) }}
+                </span>
+              </dd>
             </div>
           </dl>
           <div class="mt-6 flex justify-end space-x-3">
@@ -214,6 +233,28 @@
             </div>
           </div>
 
+          <!-- Types d'équipement gérés -->
+          <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm">
+            <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-4">Types d'équipement gérés</h3>
+            <div class="space-y-4">
+              <p class="text-sm text-gray-500 dark:text-gray-400">Sélectionnez les types d'équipement dont ce département est responsable.</p>
+              <div class="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4">
+                <div v-for="type in equipmentTypes" :key="type" class="flex items-center">
+                  <input
+                    type="checkbox"
+                    :id="`equipType-${type}`"
+                    v-model="form.managedEquipmentTypes"
+                    :value="type"
+                    class="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500 dark:border-gray-600 dark:bg-gray-700"
+                  />
+                  <label :for="`equipType-${type}`" class="ml-2 text-sm text-gray-700 dark:text-gray-300">
+                    {{ getEquipmentTypeLabel(type) }}
+                  </label>
+                </div>
+              </div>
+            </div>
+          </div>
+
           <!-- Boutons d'action -->
           <div class="flex justify-center space-x-3">
             <button
@@ -259,7 +300,8 @@ export default {
     const filters = ref({
       search: '',
       type: '',
-      isActive: ''
+      isActive: '',
+      managesEquipmentType: ''
     });
 
     const departmentTypes = [
@@ -270,6 +312,17 @@ export default {
       'SECURITE'
     ];
 
+    const equipmentTypes = [
+      'ANTENNE',
+      'ROUTEUR',
+      'BATTERIE',
+      'GÉNÉRATEUR',
+      'REFROIDISSEMENT',
+      'SHELTER',
+      'PYLÔNE',
+      'SÉCURITÉ'
+    ];
+
     const form = ref({
       name: '',
       type: 'TRANSMISSION',
@@ -277,7 +330,8 @@ export default {
       responsibleName: '',
       contactEmail: '',
       contactPhone: '',
-      isActive: true
+      isActive: true,
+      managedEquipmentTypes: []
     });
 
     const modalTitle = computed(() => 
@@ -291,7 +345,13 @@ export default {
           (item.responsibleName && item.responsibleName.toLowerCase().includes(filters.value.search.toLowerCase()));
         const matchesType = !filters.value.type || item.type === filters.value.type;
         const matchesStatus = filters.value.isActive === '' || item.isActive === filters.value.isActive;
-        return matchesSearch && matchesType && matchesStatus;
+        
+        // Filtre par type d'équipement géré
+        const matchesEquipmentType = !filters.value.managesEquipmentType || 
+          (item.managedEquipmentTypes && 
+           item.managedEquipmentTypes.includes(filters.value.managesEquipmentType));
+        
+        return matchesSearch && matchesType && matchesStatus && matchesEquipmentType;
       });
     });
 
@@ -315,6 +375,20 @@ export default {
       return labels[type] || 'Inconnu';
     };
 
+    const getEquipmentTypeLabel = (type) => {
+      const labels = {
+        ANTENNE: 'Antenne',
+        ROUTEUR: 'Routeur',
+        BATTERIE: 'Batterie',
+        'GÉNÉRATEUR': 'Générateur',
+        REFROIDISSEMENT: 'Refroidissement',
+        SHELTER: 'Shelter',
+        PYLÔNE: 'Pylône',
+        'SÉCURITÉ': 'Sécurité'
+      };
+      return labels[type] || 'Inconnu';
+    };
+
     const openAddModal = () => {
       isEditing.value = false;
       form.value = {
@@ -324,7 +398,8 @@ export default {
         responsibleName: '',
         contactEmail: '',
         contactPhone: '',
-        isActive: true
+        isActive: true,
+        managedEquipmentTypes: []
       };
       showModal.value = true;
     };
@@ -370,8 +445,10 @@ export default {
       form,
       modalTitle,
       departmentTypes,
+      equipmentTypes,
       filteredDepartments,
       getTypeLabel,
+      getEquipmentTypeLabel,
       openAddModal,
       editDepartment,
       viewDepartment,
