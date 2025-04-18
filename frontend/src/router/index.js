@@ -15,6 +15,12 @@ const routes = [
     meta: { requiresAuth: false }
   },
   {
+    path: '/admin/setup',
+    name: 'admin-setup',
+    component: () => import('@/views/auth/AdminSetupView.vue'),
+    meta: { requiresAuth: false }
+  },
+  {
     path: '/',
     redirect: () => {
       return authService.isAuthenticated() ? '/dashboard' : '/login'
@@ -54,6 +60,12 @@ const routes = [
         path: 'departments',
         name: 'departments',
         component: () => import('@/views/departments/DepartmentsView.vue')
+      },
+      {
+        path: 'admin/create',
+        name: 'admin-create',
+        component: () => import('@/views/auth/AdminCreateView.vue'),
+        meta: { requiresAdmin: true }
       }
     ]
   },
@@ -71,10 +83,14 @@ const router = createRouter({
 // Navigation guard
 router.beforeEach((to, from, next) => {
   const requiresAuth = to.matched.some(record => record.meta.requiresAuth)
+  const requiresAdmin = to.matched.some(record => record.meta.requiresAdmin)
   const isAuthenticated = authService.isAuthenticated()
+  const isAdmin = authService.isAdmin()
 
   if (requiresAuth && !isAuthenticated) {
     next('/login')
+  } else if (requiresAdmin && !isAdmin) {
+    next('/dashboard')
   } else if (to.path === '/login' && isAuthenticated) {
     next('/dashboard')
   } else {

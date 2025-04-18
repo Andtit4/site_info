@@ -48,6 +48,14 @@
               v-if="isProfileMenuOpen"
               class="origin-top-right absolute right-0 mt-2 w-48 rounded-md shadow-lg py-1 bg-white dark:bg-gray-800 ring-1 ring-black ring-opacity-5"
             >
+              <router-link
+                v-if="isAdmin"
+                to="/dashboard/admin/create"
+                class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700"
+                @click="isProfileMenuOpen = false"
+              >
+                Créer un administrateur
+              </router-link>
               <a
                 href="#"
                 class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700"
@@ -135,6 +143,10 @@ export default {
       return user?.avatar || 'https://ui-avatars.com/api/?name=' + (user?.username || 'User');
     });
 
+    const isAdmin = computed(() => {
+      return authService.isAdmin();
+    });
+
     const logout = async () => {
       await authService.logout();
       router.push('/login');
@@ -146,6 +158,7 @@ export default {
       toggleTheme,
       isProfileMenuOpen,
       userAvatar,
+      isAdmin,
       logout
     };
   }

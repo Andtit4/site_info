@@ -46,6 +46,10 @@
           <span v-if="loading" class="spinner-border spinner-border-sm mr-2"></span>
           {{ loading ? 'Connexion en cours...' : 'Se connecter' }}
         </button>
+        
+        <div class="admin-setup-link">
+          <router-link to="/admin/setup">Configurer un administrateur initial</router-link>
+        </div>
       </form>
     </div>
   </div>
@@ -248,39 +252,28 @@ export default {
   cursor: not-allowed;
 }
 
-.dark .btn-primary:disabled {
-  background-color: #4d4d4d;
+.admin-setup-link {
+  text-align: center;
+  margin-top: 1rem;
+  font-size: 0.875rem;
 }
 
-.alert {
-  padding: 0.75rem;
-  border-radius: 4px;
-  margin-bottom: 1rem;
+.admin-setup-link a {
+  color: #4a90e2;
+  text-decoration: none;
+  transition: color 0.3s ease;
 }
 
-.alert-danger {
-  background-color: #f8d7da;
-  color: #721c24;
-  border: 1px solid #f5c6cb;
+.admin-setup-link a:hover {
+  text-decoration: underline;
+  color: #357abd;
 }
 
-.dark .alert-danger {
-  background-color: #442222;
-  color: #ff6b6b;
-  border: 1px solid #662222;
+.dark .admin-setup-link a {
+  color: #60a5fa;
 }
 
-.spinner-border {
-  display: inline-block;
-  width: 1rem;
-  height: 1rem;
-  border: 0.2em solid currentColor;
-  border-right-color: transparent;
-  border-radius: 50%;
-  animation: spinner-border 0.75s linear infinite;
-}
-
-@keyframes spinner-border {
-  to { transform: rotate(360deg); }
+.dark .admin-setup-link a:hover {
+  color: #3b82f6;
 }
 </style> 

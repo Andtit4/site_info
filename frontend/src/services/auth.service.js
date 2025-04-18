@@ -35,13 +35,13 @@ export default {
   async login(credentials) {
     try {
       const response = await axios.post(`${API_URL}/auth/login`, credentials)
-      const { user, token } = response.data
+      const { access_token, user } = response.data
       
       // Stocker le token et les informations utilisateur
-      localStorage.setItem('token', token)
+      localStorage.setItem('token', access_token)
       localStorage.setItem('user', JSON.stringify(user))
       
-      return { user, token }
+      return { user, token: access_token }
     } catch (error) {
       console.error('Erreur lors de la connexion:', error)
       throw new Error(error.response?.data?.message || 'Erreur lors de la connexion')
@@ -72,6 +72,11 @@ export default {
     return !!localStorage.getItem('token')
   },
 
+  isAdmin() {
+    const user = this.getCurrentUser()
+    return user && user.isAdmin
+  },
+
   getToken() {
     return localStorage.getItem('token')
   },
@@ -89,6 +94,26 @@ export default {
       localStorage.setItem('user', JSON.stringify(user))
     } else {
       localStorage.removeItem('user')
+    }
+  },
+
+  async createAdmin(adminData) {
+    try {
+      const response = await axios.post(`${API_URL}/auth/admin/create`, adminData)
+      return response.data
+    } catch (error) {
+      console.error('Erreur lors de la création de l\'administrateur:', error)
+      throw new Error(error.response?.data?.message || 'Erreur lors de la création de l\'administrateur')
+    }
+  },
+
+  async setupInitialAdmin(adminData, setupKey) {
+    try {
+      const response = await axios.post(`${API_URL}/auth/setup/admin?setupKey=${setupKey}`, adminData)
+      return response.data
+    } catch (error) {
+      console.error('Erreur lors de la configuration de l\'administrateur initial:', error)
+      throw new Error(error.response?.data?.message || 'Erreur lors de la configuration de l\'administrateur initial')
     }
   }
 } 
