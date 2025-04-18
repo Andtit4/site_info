@@ -21,10 +21,10 @@ export class Department {
   name: string;
 
   @Column({
-    type: 'enum',
-    enum: DepartmentType,
+    type: 'varchar',
+    length: 255
   })
-  type: DepartmentType;
+  type: string;
 
   @Column({ nullable: true })
   description: string;
@@ -47,8 +47,8 @@ export class Department {
   @OneToMany(() => Equipment, equipment => equipment.department)
   equipment: Equipment[];
 
-  @Column('simple-array', { nullable: true })
-  managedEquipmentTypes: EquipmentType[];
+  @Column('jsonb', { nullable: true })
+  managedEquipmentTypes: string[];
 
   @Column({ default: () => 'CURRENT_TIMESTAMP' })
   createdAt: Date;

@@ -536,13 +536,6 @@
               Annuler
             </button>
             <button
-              type="button"
-              class="inline-flex items-center px-4 py-2 border border-blue-300 shadow-sm text-sm font-medium rounded-md text-blue-700 bg-white hover:bg-blue-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-              @click="debugFormData"
-            >
-              Déboguer
-            </button>
-            <button
               type="submit"
               class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
             >
@@ -657,17 +650,16 @@ export default {
       try {
         const response = await sitesApi.getAll();
         
-        // S'assurer que les IDs sont bien des strings
         const processedSites = response.map(site => ({
           ...site,
           id: String(site.id)
         }));
         
-        console.log('Sites chargés:', processedSites);
+        // console.log('Sites chargés:', processedSites);
         sites.value = processedSites;
       } catch (error) {
         console.error('Erreur lors du chargement des sites:', error);
-        toast.error('Erreur lors du chargement des sites');
+        // toast.error('Erreur lors du chargement des sites');
       }
     };
 
@@ -806,7 +798,7 @@ export default {
         teamId: '',
         specifications: {}
       };
-      console.log('Ouverture du modal d\'ajout, siteId initial:', form.value.siteId, typeof form.value.siteId);
+      // console.log('Ouverture du modal d\'ajout, siteId initial:', form.value.siteId, typeof form.value.siteId);
       showModal.value = true;
     };
 
@@ -814,7 +806,6 @@ export default {
       isEditing.value = true;
       selectedEquipment.value = equipment;
       
-      // S'assurer que les valeurs sont du bon type
       form.value = {
         ...equipment,
         siteId: equipment.siteId ? String(equipment.siteId) : '',
@@ -823,23 +814,21 @@ export default {
         specifications: equipment.specifications || {}
       };
       
-      // Vérifier et corriger le siteId si nécessaire
       if (!form.value.siteId && equipment.site && equipment.site.id) {
         console.log('Correction du siteId à partir du site associé:', equipment.site.id);
         form.value.siteId = String(equipment.site.id);
       }
       
-      // Vérifier et corriger le teamId si nécessaire
       if (!form.value.teamId && equipment.team && equipment.team.id) {
-        console.log('Correction du teamId à partir de l\'équipe associée:', equipment.team.id);
+        console.log('Correction du teamId à partir de l\'équipe associe:', equipment.team.id);
         form.value.teamId = String(equipment.team.id);
       }
       
-      console.log("Édition de l'équipement avec:", {
+      /* console.log("Édition de l'équipement avec:", {
         siteId: form.value.siteId,
         teamId: form.value.teamId,
         departmentId: form.value.departmentId
-      });
+      }); */
       
       showModal.value = true;
     };
@@ -859,7 +848,6 @@ export default {
       try {
         console.log('Début de la soumission du formulaire');
         
-        // Vérification et conversion du siteId
         if (form.value.siteId) {
           form.value.siteId = String(form.value.siteId);
         }
@@ -871,7 +859,6 @@ export default {
           return;
         }
 
-        // Préparation des données pour l'envoi
         const formData = {
           id: form.value.id,
           type: form.value.type,
@@ -887,10 +874,10 @@ export default {
           specifications: form.value.specifications || {}
         };
 
-        console.log('Données du formulaire prêtes à envoyer:', formData);
+        // console.log(formData);
 
         if (isEditing.value && selectedEquipment.value) {
-          console.log('Mise à jour de l\'équipement:', selectedEquipment.value.id);
+          // console.log('Mise à jour de l\'équipement:', selectedEquipment.value.id);
           await equipmentApi.update(selectedEquipment.value.id, formData);
           toast.success('Équipement mis à jour avec succès');
         } else {
@@ -941,7 +928,6 @@ export default {
           return false;
         }
         
-        // Vérification simplifiée du siteId
         if (!form.value.siteId) {
           console.error('Site manquant - siteId est falsy:', form.value.siteId);
           toast.error('Le site est requis');
@@ -970,7 +956,7 @@ export default {
       
       if (responsibleDepartment) {
         form.value.departmentId = responsibleDepartment.id;
-        toast.info(`Département "${responsibleDepartment.name}" sélectionné automatiquement`);
+        // toast.info(`Département "${responsibleDepartment.name}" sélectionné automatiquement`);
       }
     };
     

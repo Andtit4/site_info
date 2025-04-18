@@ -30,10 +30,10 @@ export class Equipment {
   id: string;
 
   @Column({
-    type: 'enum',
-    enum: EquipmentType,
+    type: 'varchar',
+    length: 255
   })
-  type: EquipmentType;
+  type: string;
 
   @Column()
   model: string;
@@ -44,20 +44,20 @@ export class Equipment {
   @Column({ nullable: true })
   serialNumber: string;
 
-  @Column()
-  installDate: string;
+  @Column({ type: 'date' })
+  installDate: Date;
 
-  @Column({ nullable: true })
-  lastMaintenanceDate: string;
+  @Column({ type: 'date', nullable: true })
+  lastMaintenanceDate: Date;
 
   @Column({
-    type: 'enum',
-    enum: EquipmentStatus,
-    default: EquipmentStatus.ACTIVE,
+    type: 'varchar',
+    length: 255,
+    default: EquipmentStatus.ACTIVE
   })
-  status: EquipmentStatus;
+  status: string;
 
-  @Column('json', { nullable: true })
+  @Column('jsonb', { nullable: true })
   specifications: Record<string, string>;
 
   @ManyToOne(() => Site, site => site.equipment, {

@@ -30,7 +30,11 @@ export class Site {
   @Column('decimal', { precision: 10, scale: 6 })
   latitude: number;
 
-  @Column({ default: SiteStatus.ACTIVE })
+  @Column({
+    type: 'varchar',
+    length: 255,
+    default: SiteStatus.ACTIVE
+  })
   status: string;
 
   @Column({ nullable: true })

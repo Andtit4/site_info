@@ -1,4 +1,4 @@
-import { Entity, Column, PrimaryColumn, ManyToOne, JoinColumn, OneToMany, ManyToMany, JoinTable } from 'typeorm';
+import { Entity, Column, PrimaryColumn, ManyToOne, JoinColumn, OneToMany, ManyToMany, JoinTable, CreateDateColumn } from 'typeorm';
 import { Department } from '../../entities/department.entity';
 import { Site } from '../../entities/site.entity';
 import { Equipment } from '../../entities/equipment.entity';
@@ -22,11 +22,11 @@ export class Team {
   description: string;
 
   @Column({
-    type: 'enum',
-    enum: TeamStatus,
+    type: 'varchar',
+    length: 255,
     default: TeamStatus.ACTIVE
   })
-  status: TeamStatus;
+  status: string;
 
   @Column({ nullable: true })
   leadName: string;
@@ -40,25 +40,21 @@ export class Team {
   @Column({ nullable: true })
   location: string;
 
-  @Column({
-    type: 'datetime',
-    default: () => 'CURRENT_TIMESTAMP'
-  })
+  @CreateDateColumn()
   createdAt: Date;
 
-  @Column({ nullable: true })
-  lastActiveDate: string;
+  @Column({ type: 'date', nullable: true })
+  lastActiveDate: Date;
 
-  @Column('json', { nullable: true })
+  @Column('jsonb', { nullable: true })
   metadata: Record<string, any>;
 
   @Column({
-    type: 'enum',
-    enum: EquipmentType,
-    enumName: 'equipment_type_enum',
+    type: 'varchar',
+    length: 255,
     nullable: true
   })
-  equipmentType: EquipmentType;
+  equipmentType: string;
 
   @ManyToOne(() => Department, department => department.teams, {
     onDelete: 'CASCADE'

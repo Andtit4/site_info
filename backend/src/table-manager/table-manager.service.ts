@@ -26,9 +26,7 @@ export class TableManagerService {
           columnDefinition += ' NOT NULL';
         }
         if (column.defaultValue !== undefined) {
-          // Gérer les valeurs par défaut selon le type
           if (column.type === 'int' || column.type === 'float' || column.type === 'decimal') {
-            // Pour les types numériques, utiliser NULL comme valeur par défaut si la valeur est vide
             columnDefinition += column.defaultValue === '' ? ' DEFAULT NULL' : ` DEFAULT ${column.defaultValue}`;
           } else {
             columnDefinition += ` DEFAULT '${column.defaultValue}'`;
