@@ -20,7 +20,7 @@ export const typeOrmConfig = (configService: ConfigService): DataSourceOptions =
   host: configService.get('DATABASE_HOST', 'localhost'),
   port: configService.get<number>('DATABASE_PORT', 5432),
   username: configService.get('DATABASE_USERNAME', 'postgres'),
-  password: String(configService.get('DATABASE_PASSWORD', '')),
+  password: 'motdepasse',
   database: configService.get('DATABASE_NAME', 'site_info_db'),
   entities: [__dirname + '/../**/*.entity{.ts,.js}'],
   migrations: [__dirname + '/../migrations/*{.ts,.js}'],
