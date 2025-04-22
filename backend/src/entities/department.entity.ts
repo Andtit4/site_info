@@ -1,7 +1,8 @@
-import { Entity, Column, PrimaryGeneratedColumn, OneToMany, ManyToMany, JoinTable } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, OneToMany, ManyToMany, JoinTable, BeforeInsert } from 'typeorm';
 import { Equipment } from './equipment.entity';
 import { Team } from '../teams/entities/team.entity';
 import { EquipmentType } from './equipment.entity';
+import { v4 as uuidv4 } from 'uuid';
 
 // Types de départements
 export enum DepartmentType {
@@ -16,6 +17,13 @@ export enum DepartmentType {
 export class Department {
   @PrimaryGeneratedColumn('uuid')
   id: string;
+
+  @BeforeInsert()
+  generateId() {
+    if (!this.id) {
+      this.id = uuidv4();
+    }
+  }
 
   @Column()
   name: string;

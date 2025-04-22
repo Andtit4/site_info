@@ -9,6 +9,7 @@ export declare enum DepartmentType {
 }
 export declare class Department {
     id: string;
+    generateId(): void;
     name: string;
     type: string;
     description: string;

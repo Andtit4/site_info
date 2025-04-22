@@ -11,13 +11,25 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Specification = void 0;
 const typeorm_1 = require("typeorm");
+const uuid_1 = require("uuid");
 let Specification = class Specification {
+    generateId() {
+        if (!this.id) {
+            this.id = (0, uuid_1.v4)();
+        }
+    }
 };
 exports.Specification = Specification;
 __decorate([
     (0, typeorm_1.PrimaryGeneratedColumn)('uuid'),
     __metadata("design:type", String)
 ], Specification.prototype, "id", void 0);
+__decorate([
+    (0, typeorm_1.BeforeInsert)(),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", []),
+    __metadata("design:returntype", void 0)
+], Specification.prototype, "generateId", null);
 __decorate([
     (0, typeorm_1.Column)({
         type: 'enum',
@@ -31,7 +43,6 @@ __decorate([
             'PYLÔNE',
             'SÉCURITÉ'
         ],
-        enumName: 'equipment_type_enum',
         nullable: false
     }),
     __metadata("design:type", String)

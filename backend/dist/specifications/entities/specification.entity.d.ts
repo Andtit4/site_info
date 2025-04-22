@@ -1,5 +1,6 @@
 export declare class Specification {
     id: string;
+    generateId(): void;
     equipmentType: string;
     columns: Array<{
         name: string;

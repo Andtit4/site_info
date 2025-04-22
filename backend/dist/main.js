@@ -13,7 +13,7 @@ async function bootstrap() {
         forbidNonWhitelisted: true,
     }));
     app.enableCors({
-        origin: ['http://localhost:8080'],
+        origin: ['http://localhost:8080', 'http://185.97.146.99:5000'],
         methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
         credentials: true,
     });

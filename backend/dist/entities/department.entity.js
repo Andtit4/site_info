@@ -13,6 +13,7 @@ exports.Department = exports.DepartmentType = void 0;
 const typeorm_1 = require("typeorm");
 const equipment_entity_1 = require("./equipment.entity");
 const team_entity_1 = require("../teams/entities/team.entity");
+const uuid_1 = require("uuid");
 var DepartmentType;
 (function (DepartmentType) {
     DepartmentType["TRANSMISSION"] = "TRANSMISSION";
@@ -22,12 +23,23 @@ var DepartmentType;
     DepartmentType["SECURITE"] = "SECURITE";
 })(DepartmentType || (exports.DepartmentType = DepartmentType = {}));
 let Department = class Department {
+    generateId() {
+        if (!this.id) {
+            this.id = (0, uuid_1.v4)();
+        }
+    }
 };
 exports.Department = Department;
 __decorate([
     (0, typeorm_1.PrimaryGeneratedColumn)('uuid'),
     __metadata("design:type", String)
 ], Department.prototype, "id", void 0);
+__decorate([
+    (0, typeorm_1.BeforeInsert)(),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", []),
+    __metadata("design:returntype", void 0)
+], Department.prototype, "generateId", null);
 __decorate([
     (0, typeorm_1.Column)(),
     __metadata("design:type", String)

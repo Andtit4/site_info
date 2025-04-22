@@ -1,5 +1,6 @@
 export declare class User {
     id: string;
+    generateId(): void;
     username: string;
     password: string;
     firstName: string;

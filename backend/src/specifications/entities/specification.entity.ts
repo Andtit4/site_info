@@ -1,9 +1,17 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, BeforeInsert } from 'typeorm';
+import { v4 as uuidv4 } from 'uuid';
 
 @Entity('specifications')
 export class Specification {
   @PrimaryGeneratedColumn('uuid')
   id: string;
+
+  @BeforeInsert()
+  generateId() {
+    if (!this.id) {
+      this.id = uuidv4();
+    }
+  }
 
   @Column({
     type: 'enum',
@@ -17,7 +25,6 @@ export class Specification {
       'PYLÔNE',
       'SÉCURITÉ'
     ],
-    enumName: 'equipment_type_enum',
     nullable: false
   })
   equipmentType: string;
