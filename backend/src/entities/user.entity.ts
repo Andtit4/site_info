@@ -28,10 +28,10 @@ export class User {
   @Column({ nullable: true })
   email: string;
 
-  @Column({ default: false })
+  @Column({ name: 'isAdmin', type: 'boolean', default: false })
   isAdmin: boolean;
 
-  @Column({ default: true })
+  @Column({ name: 'isActive', type: 'boolean', default: true })
   isActive: boolean;
 
   @Column({ nullable: true })

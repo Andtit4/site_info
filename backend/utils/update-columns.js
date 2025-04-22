@@ -16,6 +16,61 @@ async function main() {
     try {
         console.log('Connexion à la base de données établie');
 
+        // Vérification et correction des noms de colonnes dans la table users
+        console.log('Vérification des colonnes de la table users...');
+        try {
+            const [userColumns] = await connection.query(`SHOW COLUMNS FROM users;`);
+
+            // Vérification de la colonne isAdmin
+            let hasIsAdmin = false;
+            let hasIsadmin = false;
+            for (const col of userColumns) {
+                if (col.Field === 'isAdmin') hasIsAdmin = true;
+                if (col.Field === 'isadmin') hasIsadmin = true;
+            }
+
+            // Correction si nécessaire
+            if (!hasIsAdmin && hasIsadmin) {
+                console.log('Correction de la colonne isadmin vers isAdmin...');
+                await connection.query(`
+                    ALTER TABLE users 
+                    CHANGE COLUMN isadmin isAdmin TINYINT NOT NULL DEFAULT 0;
+                `);
+            } else if (!hasIsAdmin && !hasIsadmin) {
+                console.log('Ajout de la colonne isAdmin...');
+                await connection.query(`
+                    ALTER TABLE users 
+                    ADD COLUMN isAdmin TINYINT NOT NULL DEFAULT 0;
+                `);
+            }
+
+            // Vérification de la colonne isActive
+            let hasIsActive = false;
+            let hasIsactive = false;
+            for (const col of userColumns) {
+                if (col.Field === 'isActive') hasIsActive = true;
+                if (col.Field === 'isactive') hasIsactive = true;
+            }
+
+            // Correction si nécessaire
+            if (!hasIsActive && hasIsactive) {
+                console.log('Correction de la colonne isactive vers isActive...');
+                await connection.query(`
+                    ALTER TABLE users 
+                    CHANGE COLUMN isactive isActive TINYINT NOT NULL DEFAULT 1;
+                `);
+            } else if (!hasIsActive && !hasIsactive) {
+                console.log('Ajout de la colonne isActive...');
+                await connection.query(`
+                    ALTER TABLE users 
+                    ADD COLUMN isActive TINYINT NOT NULL DEFAULT 1;
+                `);
+            }
+
+        } catch (err) {
+            console.log('Erreur lors de la vérification des colonnes users:', err.message);
+        }
+
         // Création de la table migrations si elle n'existe pas
         console.log('Création de la table migrations si nécessaire...');
         await connection.query(`
