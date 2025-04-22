@@ -655,7 +655,6 @@ export default {
           id: String(site.id)
         }));
         
-        // console.log('Sites chargés:', processedSites);
         sites.value = processedSites;
       } catch (error) {
         console.error('Erreur lors du chargement des sites:', error);
@@ -698,7 +697,6 @@ export default {
     const loadTeams = async () => {
       try {
         const response = await teamsApi.getAll();
-        console.log('Équipes chargées:', response.data);
         teams.value = response.data.map(team => ({
           ...team,
           id: String(team.id)
@@ -798,7 +796,6 @@ export default {
         teamId: '',
         specifications: {}
       };
-      // console.log('Ouverture du modal d\'ajout, siteId initial:', form.value.siteId, typeof form.value.siteId);
       showModal.value = true;
     };
 
@@ -815,20 +812,12 @@ export default {
       };
       
       if (!form.value.siteId && equipment.site && equipment.site.id) {
-        console.log('Correction du siteId à partir du site associé:', equipment.site.id);
         form.value.siteId = String(equipment.site.id);
       }
       
       if (!form.value.teamId && equipment.team && equipment.team.id) {
-        console.log('Correction du teamId à partir de l\'équipe associe:', equipment.team.id);
         form.value.teamId = String(equipment.team.id);
       }
-      
-      /* console.log("Édition de l'équipement avec:", {
-        siteId: form.value.siteId,
-        teamId: form.value.teamId,
-        departmentId: form.value.departmentId
-      }); */
       
       showModal.value = true;
     };
@@ -846,16 +835,11 @@ export default {
 
     const handleSubmit = async () => {
       try {
-        console.log('Début de la soumission du formulaire');
-        
         if (form.value.siteId) {
           form.value.siteId = String(form.value.siteId);
         }
         
-        console.log('Site ID avant validation:', form.value.siteId, typeof form.value.siteId);
-        
         if (!validateForm()) {
-          console.log('Validation du formulaire échouée');
           return;
         }
 
@@ -874,14 +858,10 @@ export default {
           specifications: form.value.specifications || {}
         };
 
-        // console.log(formData);
-
         if (isEditing.value && selectedEquipment.value) {
-          // console.log('Mise à jour de l\'équipement:', selectedEquipment.value.id);
           await equipmentApi.update(selectedEquipment.value.id, formData);
           toast.success('Équipement mis à jour avec succès');
         } else {
-          console.log('Création d\'un nouvel équipement');
           await equipmentApi.create(formData);
           toast.success('Équipement créé avec succès');
         }
@@ -889,58 +869,38 @@ export default {
         showModal.value = false;
         loadEquipment();
       } catch (error) {
-        console.error('Erreur lors de la soumission:', error);
         if (error.response) {
-          console.error('Détails de l\'erreur:', error.response.data);
           toast.error(error.response.data.message || 'Une erreur est survenue');
         } else {
-          console.error('Erreur sans réponse:', error);
           toast.error('Une erreur est survenue lors de la soumission');
         }
       }
     };
 
     const validateForm = () => {
-      try {
-        console.log('Validation du formulaire avec les valeurs:', {
-          id: form.value.id,
-          type: form.value.type,
-          model: form.value.model,
-          installDate: form.value.installDate,
-          siteId: form.value.siteId,
-          'typeof siteId': typeof form.value.siteId
-        });
-        
-        if (!form.value.id) {
-          toast.error('L\'ID de l\'équipement est requis');
-          return false;
-        }
-        if (!form.value.type) {
-          toast.error('Le type d\'équipement est requis');
-          return false;
-        }
-        if (!form.value.model) {
-          toast.error('Le modèle est requis');
-          return false;
-        }
-        if (!form.value.installDate) {
-          toast.error('La date d\'installation est requise');
-          return false;
-        }
-        
-        if (!form.value.siteId) {
-          console.error('Site manquant - siteId est falsy:', form.value.siteId);
-          toast.error('Le site est requis');
-          return false;
-        }
-        
-        console.log('Validation réussie avec siteId:', form.value.siteId);
-        return true;
-      } catch (error) {
-        console.error('Erreur lors de la validation:', error);
-        toast.error('Une erreur est survenue lors de la validation');
+      if (!form.value.id) {
+        toast.error('L\'ID de l\'équipement est requis');
         return false;
       }
+      if (!form.value.type) {
+        toast.error('Le type d\'équipement est requis');
+        return false;
+      }
+      if (!form.value.model) {
+        toast.error('Le modèle est requis');
+        return false;
+      }
+      if (!form.value.installDate) {
+        toast.error('La date d\'installation est requise');
+        return false;
+      }
+      
+      if (!form.value.siteId) {
+        toast.error('Le site est requis');
+        return false;
+      }
+      
+      return true;
     };
 
     // Watcher pour mettre à jour automatiquement le département en fonction du type d'équipement
@@ -956,7 +916,6 @@ export default {
       
       if (responsibleDepartment) {
         form.value.departmentId = responsibleDepartment.id;
-        // toast.info(`Département "${responsibleDepartment.name}" sélectionné automatiquement`);
       }
     };
     
@@ -971,51 +930,17 @@ export default {
     const handleSiteChange = (event) => {
       // Récupérer la valeur directement depuis l'événement
       const selectedValue = event.target.value;
-      console.log('Site sélectionné depuis l\'événement:', form.value.siteId, typeof selectedValue);
       
       if (selectedValue === "") {
-        console.log('Aucun site sélectionné');
         form.value.siteId = "";
         return;
       }
       
       // Forcer la conversion en string et l'assigner directement
       form.value.siteId = String(selectedValue);
-      
-      // Vérifier que la valeur a été correctement assignée
-      console.log('Après mise à jour directe, siteId =', form.value.siteId, typeof form.value.siteId);
-      
-      // Rechercher le site correspondant pour l'affichage des détails
-      const site = sites.value.find(s => String(s.id) === String(selectedValue));
-      if (site) {
-        console.log('Site trouvé:', site.name, 'avec ID:', site.id);
-      } else {
-        console.error('Site non trouvé pour l\'ID:', selectedValue);
-      }
     };
 
     const debugFormData = () => {
-      console.log('=== DONNÉES DU FORMULAIRE (DÉBOGAGE) ===');
-      console.log('Form data complet:', form.value);
-      console.log('SiteId actuel:', form.value.siteId, 'Type:', typeof form.value.siteId);
-      
-      // Tester si le siteId est correctement défini
-      if (!form.value.siteId) {
-        console.warn('Le siteId est falsy:', form.value.siteId);
-      }
-      
-      // Afficher la liste des sites pour vérification
-      console.log('Sites disponibles:', sites.value);
-      
-      // Tenter de corriger le siteId si un site est sélectionné visuellement mais pas stocké
-      const siteSelect = document.getElementById('siteId');
-      if (siteSelect && siteSelect.value && !form.value.siteId) {
-        console.log('Valeur du select de site:', siteSelect.value);
-        console.log('Correction manuelle du siteId avec la valeur du select');
-        form.value.siteId = siteSelect.value;
-        console.log('SiteId après correction:', form.value.siteId);
-      }
-      
       toast.info('Données de débogage dans la console');
     };
 
@@ -1030,7 +955,6 @@ export default {
     // Surveillance du changement de type d'équipement
     watch(() => form.value.type, (newValue) => {
       if (newValue) {
-        console.log('Type d\'équipement changé:', newValue);
         updateDepartmentBasedOnType(newValue);
         // Réinitialiser les spécifications lors du changement de type
         form.value.specifications = {};

@@ -21,6 +21,7 @@ const jwt_auth_guard_1 = require("./guards/jwt-auth.guard");
 const create_admin_dto_1 = require("./dto/create-admin.dto");
 const users_service_1 = require("../users/users.service");
 const admin_guard_1 = require("./guards/admin.guard");
+const swagger_1 = require("@nestjs/swagger");
 let AuthController = class AuthController {
     constructor(authService, usersService) {
         this.authService = authService;
@@ -70,6 +71,10 @@ let AuthController = class AuthController {
 };
 exports.AuthController = AuthController;
 __decorate([
+    (0, swagger_1.ApiOperation)({ summary: 'Connexion utilisateur', description: 'Permet à un utilisateur de se connecter et obtenir un token JWT' }),
+    (0, swagger_1.ApiBody)({ type: login_dto_1.LoginDto }),
+    (0, swagger_1.ApiResponse)({ status: 200, description: 'Connexion réussie, retourne un token JWT' }),
+    (0, swagger_1.ApiResponse)({ status: 401, description: 'Identifiants incorrects' }),
     (0, common_1.UseGuards)(local_auth_guard_1.LocalAuthGuard),
     (0, common_1.Post)('login'),
     (0, common_1.HttpCode)(common_1.HttpStatus.OK),
@@ -79,6 +84,10 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], AuthController.prototype, "login", null);
 __decorate([
+    (0, swagger_1.ApiOperation)({ summary: 'Profil utilisateur', description: 'Récupère les informations de l\'utilisateur connecté' }),
+    (0, swagger_1.ApiResponse)({ status: 200, description: 'Profil utilisateur récupéré avec succès' }),
+    (0, swagger_1.ApiResponse)({ status: 401, description: 'Non autorisé - Token JWT manquant ou invalide' }),
+    (0, swagger_1.ApiBearerAuth)('JWT-auth'),
     (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
     (0, common_1.Get)('me'),
     __param(0, (0, common_1.Request)()),
@@ -87,6 +96,12 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], AuthController.prototype, "getProfile", null);
 __decorate([
+    (0, swagger_1.ApiOperation)({ summary: 'Créer un administrateur', description: 'Permet à un administrateur existant de créer un nouvel administrateur' }),
+    (0, swagger_1.ApiBody)({ type: create_admin_dto_1.CreateAdminDto }),
+    (0, swagger_1.ApiResponse)({ status: 201, description: 'Administrateur créé avec succès' }),
+    (0, swagger_1.ApiResponse)({ status: 401, description: 'Non autorisé - Token JWT manquant ou invalide' }),
+    (0, swagger_1.ApiResponse)({ status: 403, description: 'Interdit - L\'utilisateur n\'est pas administrateur' }),
+    (0, swagger_1.ApiBearerAuth)('JWT-auth'),
     (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard, admin_guard_1.AdminGuard),
     (0, common_1.Post)('admin/create'),
     (0, common_1.HttpCode)(common_1.HttpStatus.CREATED),
@@ -96,6 +111,11 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], AuthController.prototype, "createAdmin", null);
 __decorate([
+    (0, swagger_1.ApiOperation)({ summary: 'Configuration initiale administrateur', description: 'Permet de créer le premier administrateur avec une clé de configuration' }),
+    (0, swagger_1.ApiBody)({ type: create_admin_dto_1.CreateAdminDto }),
+    (0, swagger_1.ApiQuery)({ name: 'setupKey', description: 'Clé de configuration sécurisée définie dans les variables d\'environnement', required: true }),
+    (0, swagger_1.ApiResponse)({ status: 201, description: 'Administrateur initial créé avec succès' }),
+    (0, swagger_1.ApiResponse)({ status: 400, description: 'Erreur - Clé de configuration invalide ou administrateur déjà existant' }),
     (0, common_1.Post)('setup/admin'),
     (0, common_1.HttpCode)(common_1.HttpStatus.CREATED),
     __param(0, (0, common_1.Body)()),
@@ -105,6 +125,7 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], AuthController.prototype, "setupInitialAdmin", null);
 exports.AuthController = AuthController = __decorate([
+    (0, swagger_1.ApiTags)('auth'),
     (0, common_1.Controller)('auth'),
     __metadata("design:paramtypes", [auth_service_1.AuthService,
         users_service_1.UsersService])

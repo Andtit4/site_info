@@ -6,7 +6,9 @@ import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { CreateAdminDto } from './dto/create-admin.dto';
 import { UsersService } from '../users/users.service';
 import { AdminGuard } from './guards/admin.guard';
+import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth, ApiBody, ApiQuery } from '@nestjs/swagger';
 
+@ApiTags('auth')
 @Controller('auth')
 export class AuthController {
   constructor(
@@ -14,6 +16,10 @@ export class AuthController {
     private readonly usersService: UsersService
   ) {}
 
+  @ApiOperation({ summary: 'Connexion utilisateur', description: 'Permet à un utilisateur de se connecter et obtenir un token JWT' })
+  @ApiBody({ type: LoginDto })
+  @ApiResponse({ status: 200, description: 'Connexion réussie, retourne un token JWT' })
+  @ApiResponse({ status: 401, description: 'Identifiants incorrects' })
   @UseGuards(LocalAuthGuard)
   @Post('login')
   @HttpCode(HttpStatus.OK)
@@ -21,12 +27,22 @@ export class AuthController {
     return this.authService.login(loginDto);
   }
 
+  @ApiOperation({ summary: 'Profil utilisateur', description: 'Récupère les informations de l\'utilisateur connecté' })
+  @ApiResponse({ status: 200, description: 'Profil utilisateur récupéré avec succès' })
+  @ApiResponse({ status: 401, description: 'Non autorisé - Token JWT manquant ou invalide' })
+  @ApiBearerAuth('JWT-auth')
   @UseGuards(JwtAuthGuard)
   @Get('me')
   async getProfile(@Request() req) {
     return req.user;
   }
 
+  @ApiOperation({ summary: 'Créer un administrateur', description: 'Permet à un administrateur existant de créer un nouvel administrateur' })
+  @ApiBody({ type: CreateAdminDto })
+  @ApiResponse({ status: 201, description: 'Administrateur créé avec succès' })
+  @ApiResponse({ status: 401, description: 'Non autorisé - Token JWT manquant ou invalide' })
+  @ApiResponse({ status: 403, description: 'Interdit - L\'utilisateur n\'est pas administrateur' })
+  @ApiBearerAuth('JWT-auth')
   @UseGuards(JwtAuthGuard, AdminGuard)
   @Post('admin/create')
   @HttpCode(HttpStatus.CREATED)
@@ -43,6 +59,11 @@ export class AuthController {
     };
   }
 
+  @ApiOperation({ summary: 'Configuration initiale administrateur', description: 'Permet de créer le premier administrateur avec une clé de configuration' })
+  @ApiBody({ type: CreateAdminDto })
+  @ApiQuery({ name: 'setupKey', description: 'Clé de configuration sécurisée définie dans les variables d\'environnement', required: true })
+  @ApiResponse({ status: 201, description: 'Administrateur initial créé avec succès' })
+  @ApiResponse({ status: 400, description: 'Erreur - Clé de configuration invalide ou administrateur déjà existant' })
   @Post('setup/admin')
   @HttpCode(HttpStatus.CREATED)
   async setupInitialAdmin(
