@@ -68,7 +68,7 @@ __decorate([
     __metadata("design:type", Array)
 ], Department.prototype, "equipment", void 0);
 __decorate([
-    (0, typeorm_1.Column)('jsonb', { nullable: true }),
+    (0, typeorm_1.Column)('json', { nullable: true }),
     __metadata("design:type", Array)
 ], Department.prototype, "managedEquipmentTypes", void 0);
 __decorate([

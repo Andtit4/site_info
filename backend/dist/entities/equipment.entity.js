@@ -76,7 +76,7 @@ __decorate([
     __metadata("design:type", String)
 ], Equipment.prototype, "status", void 0);
 __decorate([
-    (0, typeorm_1.Column)('jsonb', { nullable: true }),
+    (0, typeorm_1.Column)('json', { nullable: true }),
     __metadata("design:type", Object)
 ], Equipment.prototype, "specifications", void 0);
 __decorate([

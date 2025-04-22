@@ -47,7 +47,7 @@ export class Department {
   @OneToMany(() => Equipment, equipment => equipment.department)
   equipment: Equipment[];
 
-  @Column('jsonb', { nullable: true })
+  @Column('json', { nullable: true })
   managedEquipmentTypes: string[];
 
   @Column({ default: () => 'CURRENT_TIMESTAMP' })

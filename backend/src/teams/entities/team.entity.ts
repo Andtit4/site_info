@@ -46,7 +46,7 @@ export class Team {
   @Column({ type: 'date', nullable: true })
   lastActiveDate: Date;
 
-  @Column('jsonb', { nullable: true })
+  @Column('json', { nullable: true })
   metadata: Record<string, any>;
 
   @Column({

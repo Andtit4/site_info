@@ -57,7 +57,7 @@ export class Equipment {
   })
   status: string;
 
-  @Column('jsonb', { nullable: true })
+  @Column('json', { nullable: true })
   specifications: Record<string, string>;
 
   @ManyToOne(() => Site, site => site.equipment, {

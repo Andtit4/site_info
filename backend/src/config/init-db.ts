@@ -4,7 +4,7 @@ import { config } from 'dotenv';
 config();
 
 const AppDataSource = new DataSource({
-  type: 'postgres',
+  type: 'mysql',
   host: process.env.DATABASE_HOST || 'localhost',
   port: parseInt(process.env.DATABASE_PORT || '3306', 10),
   username: process.env.DATABASE_USERNAME || 'root',
@@ -12,9 +12,7 @@ const AppDataSource = new DataSource({
   database: process.env.DATABASE_NAME || 'site_info_db',
   synchronize: false,
   logging: true,
-  extra: {
-    charset: 'utf8mb4_unicode_ci',
-  },
+  charset: 'utf8mb4_unicode_ci',
 });
 
 async function initializeDatabase() {
@@ -27,6 +25,9 @@ async function initializeDatabase() {
     await AppDataSource.query(`CREATE DATABASE IF NOT EXISTS ${process.env.DATABASE_NAME || 'site_info_db'}`);
     console.log('Base de données créée ou déjà existante');
 
+    // Utiliser la base de données
+    await AppDataSource.query(`USE ${process.env.DATABASE_NAME || 'site_info_db'}`);
+
     // Créer les tables
     await AppDataSource.query(`
       CREATE TABLE IF NOT EXISTS department (
@@ -35,7 +36,7 @@ async function initializeDatabase() {
         description text,
         createdAt timestamp DEFAULT CURRENT_TIMESTAMP,
         updatedAt timestamp DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-      )
+      ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
     `);
     console.log('Table department créée');
 
@@ -47,7 +48,7 @@ async function initializeDatabase() {
         status ENUM('ACTIF', 'INACTIF', 'MAINTENANCE') DEFAULT 'ACTIF',
         createdAt timestamp DEFAULT CURRENT_TIMESTAMP,
         updatedAt timestamp DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-      )
+      ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
     `);
     console.log('Table site créée');
 
@@ -64,7 +65,7 @@ async function initializeDatabase() {
         updatedAt timestamp DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
         FOREIGN KEY (siteId) REFERENCES site(id) ON DELETE SET NULL,
         FOREIGN KEY (departmentId) REFERENCES department(id) ON DELETE SET NULL
-      )
+      ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
     `);
     console.log('Table equipment créée');
 
@@ -79,7 +80,7 @@ async function initializeDatabase() {
         status ENUM('ACTIF', 'INACTIF') DEFAULT 'ACTIF',
         createdAt timestamp DEFAULT CURRENT_TIMESTAMP,
         updatedAt timestamp DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-      )
+      ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
     `);
     console.log('Table team créée');
 
@@ -90,7 +91,7 @@ async function initializeDatabase() {
         PRIMARY KEY (teamId, siteId),
         FOREIGN KEY (teamId) REFERENCES team(id) ON DELETE CASCADE,
         FOREIGN KEY (siteId) REFERENCES site(id) ON DELETE CASCADE
-      )
+      ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
     `);
     console.log('Table team_sites créée');
 
@@ -102,7 +103,7 @@ async function initializeDatabase() {
         columns json NOT NULL,
         createdAt timestamp DEFAULT CURRENT_TIMESTAMP,
         updatedAt timestamp DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-      )
+      ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
     `);
     console.log('Table specifications créée');
 
