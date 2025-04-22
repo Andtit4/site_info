@@ -14,9 +14,10 @@ async function bootstrap() {
         forbidNonWhitelisted: true,
     }));
     app.enableCors({
-        origin: ['http://localhost:8080', 'http://185.97.146.99:5000'],
-        methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
+        origin: ['http://localhost:8080', 'http://185.97.146.99:5000', 'https://site-info-xi.vercel.app'],
+        methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
         credentials: true,
+        allowedHeaders: ['Content-Type', 'Authorization'],
     });
     const apiPrefix = configService.get('API_PREFIX') || 'api';
     app.setGlobalPrefix(apiPrefix);
@@ -43,7 +44,13 @@ async function bootstrap() {
     swagger_1.SwaggerModule.setup('docs', app, document, {
         swaggerOptions: {
             persistAuthorization: true,
+            docExpansion: 'none',
+            tagsSorter: 'alpha',
+            operationsSorter: 'alpha',
+            displayRequestDuration: true,
         },
+        customCss: '.swagger-ui .topbar { display: none }',
+        customSiteTitle: 'Site Info API Documentation',
     });
     const port = configService.get('API_PORT') || 3000;
     await app.listen(port);
