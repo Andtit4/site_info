@@ -175,6 +175,23 @@
           </dl>
         </div>
 
+        <!-- Carte du site -->
+        <div class="mb-6">
+          <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-2">Localisation</h3>
+          <div v-if="selectedSite.latitude && selectedSite.longitude" class="h-96 w-full rounded-lg overflow-hidden shadow-md">
+            <site-map 
+              :key="`map-${selectedSite.id}`" 
+              :latitude="selectedSite.latitude" 
+              :longitude="selectedSite.longitude" 
+              :name="selectedSite.name"
+              :region="selectedSite.region"
+            />
+          </div>
+          <div v-else class="p-4 bg-gray-100 dark:bg-gray-700 rounded-lg text-center">
+            <p class="text-gray-500 dark:text-gray-400">Aucune coordonnée disponible pour ce site</p>
+          </div>
+        </div>
+
         <!-- Équipements -->
         <div class="mb-6">
           <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-2">Équipements</h3>
@@ -402,28 +419,110 @@
 </template>
 
 <script>
-import { ref, computed, onMounted } from 'vue';
+import { ref, computed, onMounted, defineComponent } from 'vue';
 import { useRouter } from 'vue-router';
 import { MagnifyingGlassIcon } from '@heroicons/vue/24/outline';
-import Modal from '@/components/Modal.vue';
+import { useToast } from 'vue-toastification';
 import sitesApi from '@/services/api/sitesApi';
+import Modal from '@/components/Modal.vue';
 import teamsApi from '@/services/api/teamsApi';
+// Import Leaflet
+import 'leaflet/dist/leaflet.css';
+
+// Définir le composant de carte comme un composant local
+const SiteMap = defineComponent({
+  name: 'SiteMap',
+  props: {
+    latitude: {
+      type: [Number, String],
+      required: true
+    },
+    longitude: {
+      type: [Number, String],
+      required: true
+    },
+    name: {
+      type: String,
+      default: ''
+    },
+    region: {
+      type: String,
+      default: ''
+    }
+  },
+  setup(props) {
+    const mapContainer = ref(null);
+    
+    onMounted(() => {
+      // Utiliser un timeout pour s'assurer que le DOM est complètement initialisé
+      setTimeout(() => {
+        // Import dynamique de Leaflet pour éviter les problèmes SSR
+        import('leaflet').then(L => {
+          if (!mapContainer.value) return;
+          
+          // Convertir en nombres pour être sûr
+          const lat = parseFloat(props.latitude);
+          const lng = parseFloat(props.longitude);
+          
+          // Créer la carte
+          const map = L.map(mapContainer.value).setView([lat, lng], 15);
+          
+          // Ajouter la couche de tuiles
+          L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+          }).addTo(map);
+          
+          // Ajouter un marqueur
+          const marker = L.marker([lat, lng]).addTo(map);
+          
+          // Ajouter un popup au marqueur
+          if (props.name) {
+            marker.bindPopup(`
+              <div>
+                <h4 style="font-weight: 500;">${props.name}</h4>
+                <p style="font-size: 0.875rem;">${props.region || ''}</p>
+              </div>
+            `).openPopup();
+          }
+          
+          // Ajouter un cercle
+          L.circle([lat, lng], {
+            radius: 100,
+            color: 'blue',
+            fillColor: 'blue',
+            fillOpacity: 0.2
+          }).addTo(map);
+          
+          // Forcer un recalcul de la taille
+          setTimeout(() => {
+            map.invalidateSize();
+          }, 100);
+        });
+      }, 200); // Attendre 200ms pour s'assurer que le DOM est prêt
+    });
+    
+    return { mapContainer };
+  },
+  template: `<div ref="mapContainer" style="height: 100%; width: 100%;"></div>`
+});
 
 export default {
   name: 'SitesView',
   components: {
     MagnifyingGlassIcon,
-    Modal
+    Modal,
+    SiteMap
   },
   setup() {
     const router = useRouter();
+    const toast = useToast();
     const sites = ref([]);
     const showModal = ref(false);
     const isEditing = ref(false);
     const currentSite = ref(null);
     const selectedSite = ref(null);
     const siteTeams = ref([]);
-    const availableTeams = ref([]);
+    const availableTeams = ref({ data: [] });
     const selectedTeams = ref([]);
 
     const filters = ref({
@@ -606,7 +705,7 @@ export default {
 
     const assignTeams = async () => {
       if (!selectedTeams.value.length) {
-        console.warning('Veuillez sélectionner au moins une équipe');
+        toast.warning('Veuillez sélectionner au moins une équipe');
         return;
       }
 
@@ -614,7 +713,7 @@ export default {
         await sitesApi.assignTeams(selectedSite.value.id, selectedTeams.value);
         await loadSiteTeams(selectedSite.value.id);
         selectedTeams.value = [];
-        console.success('Équipes assignées avec succès');
+        toast.success('Équipes assignées avec succès');
       } catch (error) {
         console.error('Erreur lors de l\'assignation des équipes:', error);
       }
@@ -624,7 +723,7 @@ export default {
       try {
         await sitesApi.removeTeams(selectedSite.value.id, [teamId]);
         await loadSiteTeams(selectedSite.value.id);
-        console.success('Équipe retirée avec succès');
+        toast.success('Équipe retirée avec succès');
       } catch (error) {
         console.error('Erreur lors du retrait de l\'équipe:', error);
       }
@@ -668,5 +767,9 @@ export default {
 </script>
 
 <style>
-/* Suppression des styles de la carte */
+/* Styles pour assurer que le conteneur de la carte est bien visible */
+.leaflet-container {
+  height: 100%;
+  width: 100%;
+}
 </style> 
