@@ -843,7 +843,7 @@ export default {
           return;
         }
 
-        const formData = {
+        let formData = {
           id: form.value.id,
           type: form.value.type,
           status: form.value.status || 'ACTIF',
@@ -859,6 +859,8 @@ export default {
         };
 
         if (isEditing.value && selectedEquipment.value) {
+          // Supprimer l'ID pour la mise à jour car il ne doit pas être inclus dans le DTO
+          delete formData.id;
           await equipmentApi.update(selectedEquipment.value.id, formData);
           toast.success('Équipement mis à jour avec succès');
         } else {
