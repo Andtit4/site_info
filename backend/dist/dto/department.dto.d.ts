@@ -6,7 +6,7 @@ export declare class CreateDepartmentDto {
     description?: string;
     responsibleName: string;
     contactEmail: string;
-    contactPhone?: string;
+    contactPhone?: number;
     isActive?: boolean;
     managedEquipmentTypes?: EquipmentType[];
 }
@@ -16,7 +16,7 @@ export declare class UpdateDepartmentDto {
     description?: string;
     responsibleName?: string;
     contactEmail?: string;
-    contactPhone?: string;
+    contactPhone?: number;
     isActive?: boolean;
     managedEquipmentTypes?: EquipmentType[];
 }

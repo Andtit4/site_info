@@ -45,9 +45,9 @@ __decorate([
     __metadata("design:type", String)
 ], CreateDepartmentDto.prototype, "contactEmail", void 0);
 __decorate([
-    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsNumber)(),
     (0, class_validator_1.IsOptional)(),
-    __metadata("design:type", String)
+    __metadata("design:type", Number)
 ], CreateDepartmentDto.prototype, "contactPhone", void 0);
 __decorate([
     (0, class_validator_1.IsBoolean)(),
@@ -89,9 +89,9 @@ __decorate([
     __metadata("design:type", String)
 ], UpdateDepartmentDto.prototype, "contactEmail", void 0);
 __decorate([
-    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsNumber)(),
     (0, class_validator_1.IsOptional)(),
-    __metadata("design:type", String)
+    __metadata("design:type", Number)
 ], UpdateDepartmentDto.prototype, "contactPhone", void 0);
 __decorate([
     (0, class_validator_1.IsBoolean)(),

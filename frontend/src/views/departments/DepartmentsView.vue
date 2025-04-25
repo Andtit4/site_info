@@ -424,9 +424,25 @@ export default {
     const handleSubmit = async () => {
       try {
         if (isEditing.value) {
-          await departmentsApi.update(currentDepartment.value.id, form.value);
+          // Nettoyer l'objet en ne gardant que les propriétés acceptées par l'API
+          const cleanedData = {
+            name: form.value.name,
+            type: form.value.type,
+            description: form.value.description,
+            responsibleName: form.value.responsibleName,
+            contactEmail: form.value.contactEmail,
+            contactPhone: form.value.contactPhone ? Number(form.value.contactPhone) : null,
+            isActive: form.value.isActive,
+            managedEquipmentTypes: form.value.managedEquipmentTypes
+          };
+          await departmentsApi.update(currentDepartment.value.id, cleanedData);
         } else {
-          await departmentsApi.create(form.value);
+          // S'assurer que contactPhone est bien un nombre pour la création
+          const data = { ...form.value };
+          if (data.contactPhone) {
+            data.contactPhone = Number(data.contactPhone);
+          }
+          await departmentsApi.create(data);
         }
         await loadData();
         closeModal();

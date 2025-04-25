@@ -64,8 +64,8 @@ __decorate([
     __metadata("design:type", String)
 ], Department.prototype, "contactEmail", void 0);
 __decorate([
-    (0, typeorm_1.Column)({ nullable: true }),
-    __metadata("design:type", String)
+    (0, typeorm_1.Column)({ nullable: true, type: 'float' }),
+    __metadata("design:type", Number)
 ], Department.prototype, "contactPhone", void 0);
 __decorate([
     (0, typeorm_1.Column)({ default: true }),

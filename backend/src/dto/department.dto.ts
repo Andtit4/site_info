@@ -1,4 +1,4 @@
-import { IsString, IsOptional, IsBoolean, IsEmail, IsNotEmpty, IsEnum, IsArray } from 'class-validator';
+import { IsString, IsOptional, IsBoolean, IsEmail, IsNotEmpty, IsEnum, IsArray, IsNumber } from 'class-validator';
 import { DepartmentType } from '../entities/department.entity';
 import { EquipmentType } from '../entities/equipment.entity';
 
@@ -23,9 +23,9 @@ export class CreateDepartmentDto {
   @IsNotEmpty()
   contactEmail: string;
 
-  @IsString()
+  @IsNumber()
   @IsOptional()
-  contactPhone?: string;
+  contactPhone?: number;
 
   @IsBoolean()
   @IsOptional()
@@ -58,9 +58,9 @@ export class UpdateDepartmentDto {
   @IsOptional()
   contactEmail?: string;
 
-  @IsString()
+  @IsNumber()
   @IsOptional()
-  contactPhone?: string;
+  contactPhone?: number;
 
   @IsBoolean()
   @IsOptional()

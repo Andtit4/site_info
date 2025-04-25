@@ -15,7 +15,7 @@ export declare class Department {
     description: string;
     responsibleName: string;
     contactEmail: string;
-    contactPhone: string;
+    contactPhone: number;
     isActive: boolean;
     teams: Team[];
     equipment: Equipment[];

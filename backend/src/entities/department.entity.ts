@@ -43,8 +43,8 @@ export class Department {
   @Column()
   contactEmail: string;
 
-  @Column({ nullable: true })
-  contactPhone: string;
+  @Column({ nullable: true, type: 'float' })
+  contactPhone: number;
 
   @Column({ default: true })
   isActive: boolean;
