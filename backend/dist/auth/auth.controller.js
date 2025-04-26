@@ -19,6 +19,7 @@ const login_dto_1 = require("./dto/login.dto");
 const local_auth_guard_1 = require("./guards/local-auth.guard");
 const jwt_auth_guard_1 = require("./guards/jwt-auth.guard");
 const create_admin_dto_1 = require("./dto/create-admin.dto");
+const create_department_user_dto_1 = require("./dto/create-department-user.dto");
 const users_service_1 = require("../users/users.service");
 const admin_guard_1 = require("./guards/admin.guard");
 const swagger_1 = require("@nestjs/swagger");
@@ -43,6 +44,19 @@ let AuthController = class AuthController {
             lastName: admin.lastName,
             isAdmin: admin.isAdmin,
             createdAt: admin.createdAt
+        };
+    }
+    async createDepartmentUser(createDepartmentUserDto) {
+        const departmentUser = await this.usersService.createDepartmentUser(createDepartmentUserDto);
+        return {
+            id: departmentUser.id,
+            username: departmentUser.username,
+            email: departmentUser.email,
+            firstName: departmentUser.firstName,
+            lastName: departmentUser.lastName,
+            isDepartmentAdmin: departmentUser.isDepartmentAdmin,
+            departmentId: departmentUser.departmentId,
+            createdAt: departmentUser.createdAt
         };
     }
     async setupInitialAdmin(createAdminDto, setupKey) {
@@ -110,6 +124,21 @@ __decorate([
     __metadata("design:paramtypes", [create_admin_dto_1.CreateAdminDto]),
     __metadata("design:returntype", Promise)
 ], AuthController.prototype, "createAdmin", null);
+__decorate([
+    (0, swagger_1.ApiOperation)({ summary: 'Créer un utilisateur de département', description: 'Permet à un administrateur de créer un utilisateur lié à un département' }),
+    (0, swagger_1.ApiBody)({ type: create_department_user_dto_1.CreateDepartmentUserDto }),
+    (0, swagger_1.ApiResponse)({ status: 201, description: 'Utilisateur de département créé avec succès' }),
+    (0, swagger_1.ApiResponse)({ status: 401, description: 'Non autorisé - Token JWT manquant ou invalide' }),
+    (0, swagger_1.ApiResponse)({ status: 403, description: 'Interdit - L\'utilisateur n\'est pas administrateur' }),
+    (0, swagger_1.ApiBearerAuth)('JWT-auth'),
+    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard, admin_guard_1.AdminGuard),
+    (0, common_1.Post)('department/create'),
+    (0, common_1.HttpCode)(common_1.HttpStatus.CREATED),
+    __param(0, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [create_department_user_dto_1.CreateDepartmentUserDto]),
+    __metadata("design:returntype", Promise)
+], AuthController.prototype, "createDepartmentUser", null);
 __decorate([
     (0, swagger_1.ApiOperation)({ summary: 'Configuration initiale administrateur', description: 'Permet de créer le premier administrateur avec une clé de configuration' }),
     (0, swagger_1.ApiBody)({ type: create_admin_dto_1.CreateAdminDto }),

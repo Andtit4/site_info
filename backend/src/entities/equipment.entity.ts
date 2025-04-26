@@ -1,4 +1,4 @@
-import { Entity, Column, PrimaryColumn, ManyToOne, JoinColumn, ManyToMany, JoinTable } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, ManyToMany, JoinColumn, CreateDateColumn, UpdateDateColumn } from 'typeorm';
 import { Site } from './site.entity';
 import { Department } from './department.entity';
 import { Team } from '../teams/entities/team.entity';
@@ -24,41 +24,55 @@ export enum EquipmentStatus {
   UNDER_INSTALLATION = 'EN_INSTALLATION',
 }
 
-@Entity()
+@Entity('equipment')
 export class Equipment {
-  @PrimaryColumn()
+  @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @Column({
-    type: 'varchar',
-    length: 255
-  })
-  type: string;
-
   @Column()
+  name: string;
+
+  @Column({ nullable: true })
+  description: string;
+
+  @Column({ nullable: true })
   model: string;
+
+  @Column({ nullable: true })
+  serialNumber: string;
 
   @Column({ nullable: true })
   manufacturer: string;
 
   @Column({ nullable: true })
-  serialNumber: string;
+  purchaseDate: Date;
 
-  @Column({ type: 'date' })
+  @Column({ nullable: true })
   installDate: Date;
 
-  @Column({ type: 'date', nullable: true })
+  @Column({ nullable: true })
   lastMaintenanceDate: Date;
 
-  @Column({
+  @Column({ 
     type: 'varchar',
-    length: 255,
-    default: EquipmentStatus.ACTIVE
+    default: 'ACTIF'
   })
   status: string;
 
-  @Column('json', { nullable: true })
-  specifications: Record<string, string>;
+  @Column({ nullable: true })
+  location: string;
+
+  @Column({ type: 'float', nullable: true })
+  purchasePrice: number;
+
+  @Column({ nullable: true })
+  warrantyExpiration: Date;
+
+  @Column({ type: 'varchar', nullable: true })
+  ipAddress: string;
+
+  @Column({ type: 'varchar', nullable: true })
+  macAddress: string;
 
   @ManyToOne(() => Site, site => site.equipment, {
     onDelete: 'CASCADE',
@@ -69,24 +83,16 @@ export class Equipment {
   @Column()
   siteId: string;
   
-  @ManyToOne(() => Department, department => department.equipment)
+  @ManyToOne(() => Department, department => department.equipment, { nullable: true })
   @JoinColumn({ name: 'departmentId' })
   department: Department;
 
   @Column({ nullable: true })
   departmentId: string;
 
-  @ManyToMany(() => Team, team => team.equipment)
-  @JoinTable({
-    name: 'team_equipment',
-    joinColumn: {
-      name: 'equipmentId',
-      referencedColumnName: 'id',
-    },
-    inverseJoinColumn: {
-      name: 'teamId',
-      referencedColumnName: 'id',
-    },
-  })
-  teams: Team[];
+  @CreateDateColumn()
+  createdAt: Date;
+
+  @UpdateDateColumn()
+  updatedAt: Date;
 } 

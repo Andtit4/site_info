@@ -13,7 +13,6 @@ exports.Equipment = exports.EquipmentStatus = exports.EquipmentType = void 0;
 const typeorm_1 = require("typeorm");
 const site_entity_1 = require("./site.entity");
 const department_entity_1 = require("./department.entity");
-const team_entity_1 = require("../teams/entities/team.entity");
 var EquipmentType;
 (function (EquipmentType) {
     EquipmentType["ANTENNA"] = "ANTENNE";
@@ -37,48 +36,68 @@ let Equipment = class Equipment {
 };
 exports.Equipment = Equipment;
 __decorate([
-    (0, typeorm_1.PrimaryColumn)(),
+    (0, typeorm_1.PrimaryGeneratedColumn)('uuid'),
     __metadata("design:type", String)
 ], Equipment.prototype, "id", void 0);
 __decorate([
-    (0, typeorm_1.Column)({
-        type: 'varchar',
-        length: 255
-    }),
-    __metadata("design:type", String)
-], Equipment.prototype, "type", void 0);
-__decorate([
     (0, typeorm_1.Column)(),
     __metadata("design:type", String)
+], Equipment.prototype, "name", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ nullable: true }),
+    __metadata("design:type", String)
+], Equipment.prototype, "description", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ nullable: true }),
+    __metadata("design:type", String)
 ], Equipment.prototype, "model", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ nullable: true }),
+    __metadata("design:type", String)
+], Equipment.prototype, "serialNumber", void 0);
 __decorate([
     (0, typeorm_1.Column)({ nullable: true }),
     __metadata("design:type", String)
 ], Equipment.prototype, "manufacturer", void 0);
 __decorate([
     (0, typeorm_1.Column)({ nullable: true }),
-    __metadata("design:type", String)
-], Equipment.prototype, "serialNumber", void 0);
+    __metadata("design:type", Date)
+], Equipment.prototype, "purchaseDate", void 0);
 __decorate([
-    (0, typeorm_1.Column)({ type: 'date' }),
+    (0, typeorm_1.Column)({ nullable: true }),
     __metadata("design:type", Date)
 ], Equipment.prototype, "installDate", void 0);
 __decorate([
-    (0, typeorm_1.Column)({ type: 'date', nullable: true }),
+    (0, typeorm_1.Column)({ nullable: true }),
     __metadata("design:type", Date)
 ], Equipment.prototype, "lastMaintenanceDate", void 0);
 __decorate([
     (0, typeorm_1.Column)({
         type: 'varchar',
-        length: 255,
-        default: EquipmentStatus.ACTIVE
+        default: 'ACTIF'
     }),
     __metadata("design:type", String)
 ], Equipment.prototype, "status", void 0);
 __decorate([
-    (0, typeorm_1.Column)('json', { nullable: true }),
-    __metadata("design:type", Object)
-], Equipment.prototype, "specifications", void 0);
+    (0, typeorm_1.Column)({ nullable: true }),
+    __metadata("design:type", String)
+], Equipment.prototype, "location", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ type: 'float', nullable: true }),
+    __metadata("design:type", Number)
+], Equipment.prototype, "purchasePrice", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ nullable: true }),
+    __metadata("design:type", Date)
+], Equipment.prototype, "warrantyExpiration", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ type: 'varchar', nullable: true }),
+    __metadata("design:type", String)
+], Equipment.prototype, "ipAddress", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ type: 'varchar', nullable: true }),
+    __metadata("design:type", String)
+], Equipment.prototype, "macAddress", void 0);
 __decorate([
     (0, typeorm_1.ManyToOne)(() => site_entity_1.Site, site => site.equipment, {
         onDelete: 'CASCADE',
@@ -91,7 +110,7 @@ __decorate([
     __metadata("design:type", String)
 ], Equipment.prototype, "siteId", void 0);
 __decorate([
-    (0, typeorm_1.ManyToOne)(() => department_entity_1.Department, department => department.equipment),
+    (0, typeorm_1.ManyToOne)(() => department_entity_1.Department, department => department.equipment, { nullable: true }),
     (0, typeorm_1.JoinColumn)({ name: 'departmentId' }),
     __metadata("design:type", department_entity_1.Department)
 ], Equipment.prototype, "department", void 0);
@@ -100,21 +119,14 @@ __decorate([
     __metadata("design:type", String)
 ], Equipment.prototype, "departmentId", void 0);
 __decorate([
-    (0, typeorm_1.ManyToMany)(() => team_entity_1.Team, team => team.equipment),
-    (0, typeorm_1.JoinTable)({
-        name: 'team_equipment',
-        joinColumn: {
-            name: 'equipmentId',
-            referencedColumnName: 'id',
-        },
-        inverseJoinColumn: {
-            name: 'teamId',
-            referencedColumnName: 'id',
-        },
-    }),
-    __metadata("design:type", Array)
-], Equipment.prototype, "teams", void 0);
+    (0, typeorm_1.CreateDateColumn)(),
+    __metadata("design:type", Date)
+], Equipment.prototype, "createdAt", void 0);
+__decorate([
+    (0, typeorm_1.UpdateDateColumn)(),
+    __metadata("design:type", Date)
+], Equipment.prototype, "updatedAt", void 0);
 exports.Equipment = Equipment = __decorate([
-    (0, typeorm_1.Entity)()
+    (0, typeorm_1.Entity)('equipment')
 ], Equipment);
 //# sourceMappingURL=equipment.entity.js.map

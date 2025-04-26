@@ -18,9 +18,14 @@ const common_1 = require("@nestjs/common");
 const typeorm_1 = require("@nestjs/typeorm");
 const typeorm_2 = require("typeorm");
 const department_entity_1 = require("../entities/department.entity");
+const equipment_entity_1 = require("../entities/equipment.entity");
+const email_service_1 = require("../services/email.service");
+const users_service_1 = require("../users/users.service");
 let DepartmentsService = DepartmentsService_1 = class DepartmentsService {
-    constructor(departmentsRepository) {
+    constructor(departmentsRepository, usersService, emailService) {
         this.departmentsRepository = departmentsRepository;
+        this.usersService = usersService;
+        this.emailService = emailService;
         this.logger = new common_1.Logger(DepartmentsService_1.name);
     }
     async create(createDepartmentDto) {
@@ -37,6 +42,9 @@ let DepartmentsService = DepartmentsService_1 = class DepartmentsService {
             const department = this.departmentsRepository.create(createDepartmentDto);
             this.logger.log(`Création d'un nouveau département: ${department.name}`);
             const savedDepartment = await this.departmentsRepository.save(department);
+            if (createDepartmentDto.createAccount !== false) {
+                await this.createDepartmentUser(savedDepartment, createDepartmentDto.password);
+            }
             if (savedDepartment.managedEquipmentTypes && typeof savedDepartment.managedEquipmentTypes === 'string') {
                 savedDepartment.managedEquipmentTypes = savedDepartment.managedEquipmentTypes
                     .split(',')
@@ -49,6 +57,34 @@ let DepartmentsService = DepartmentsService_1 = class DepartmentsService {
             this.logger.error(`Erreur lors de la création du département: ${error.message}`, error.stack);
             throw error;
         }
+    }
+    async createDepartmentUser(department, providedPassword) {
+        try {
+            const username = `dept_${department.name.toLowerCase().replace(/[^a-z0-9]/g, '_')}`;
+            const password = providedPassword || this.generateRandomPassword();
+            const createUserDto = {
+                username,
+                password,
+                email: department.contactEmail,
+                firstName: department.responsibleName.split(' ')[0] || 'Admin',
+                lastName: department.responsibleName.split(' ').slice(1).join(' ') || department.name,
+                departmentId: department.id
+            };
+            const user = await this.usersService.createDepartmentUser(createUserDto);
+            await this.emailService.sendCredentialsEmail(department.contactEmail, username, password, createUserDto.firstName, createUserDto.lastName, true);
+            this.logger.log(`Compte utilisateur créé pour le département: ${department.name}`);
+        }
+        catch (error) {
+            this.logger.error(`Erreur lors de la création du compte pour le département ${department.id}: ${error.message}`);
+        }
+    }
+    generateRandomPassword() {
+        const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*';
+        let password = '';
+        for (let i = 0; i < 12; i++) {
+            password += chars.charAt(Math.floor(Math.random() * chars.length));
+        }
+        return password;
     }
     async findAll(filterDto = {}) {
         try {
@@ -170,24 +206,20 @@ let DepartmentsService = DepartmentsService_1 = class DepartmentsService {
         try {
             const totalDepartments = await this.departmentsRepository.count();
             const activeDepartments = await this.departmentsRepository.count({ where: { isActive: true } });
-            const departmentsByType = await this.departmentsRepository
-                .createQueryBuilder('department')
-                .select('department.type', 'type')
-                .addSelect('COUNT(department.id)', 'count')
-                .groupBy('department.type')
-                .getRawMany();
-            const equipmentCountByDepartment = await this.departmentsRepository
-                .createQueryBuilder('department')
-                .leftJoinAndSelect('department.equipment', 'equipment')
-                .select('department.name', 'departmentName')
-                .addSelect('COUNT(equipment.id)', 'equipmentCount')
-                .groupBy('department.name')
-                .getRawMany();
+            const inactiveDepartments = await this.departmentsRepository.count({ where: { isActive: false } });
+            const departmentsByType = {};
+            for (const type of Object.values(equipment_entity_1.EquipmentType)) {
+                departmentsByType[type] = await this.departmentsRepository.count({
+                    where: {
+                        type: type
+                    }
+                });
+            }
             return {
-                totalDepartments,
-                activeDepartments,
-                departmentsByType,
-                equipmentCountByDepartment
+                total: totalDepartments,
+                active: activeDepartments,
+                inactive: inactiveDepartments,
+                byType: departmentsByType
             };
         }
         catch (error) {
@@ -200,6 +232,8 @@ exports.DepartmentsService = DepartmentsService;
 exports.DepartmentsService = DepartmentsService = DepartmentsService_1 = __decorate([
     (0, common_1.Injectable)(),
     __param(0, (0, typeorm_1.InjectRepository)(department_entity_1.Department)),
-    __metadata("design:paramtypes", [typeorm_2.Repository])
+    __metadata("design:paramtypes", [typeorm_2.Repository,
+        users_service_1.UsersService,
+        email_service_1.EmailService])
 ], DepartmentsService);
 //# sourceMappingURL=departments.service.js.map

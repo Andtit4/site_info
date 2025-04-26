@@ -8,10 +8,10 @@ export declare class DepartmentsController {
     create(createDepartmentDto: CreateDepartmentDto): Promise<Department>;
     findAll(filterDto: DepartmentFilterDto): Promise<Department[]>;
     getStatistics(): Promise<{
-        totalDepartments: number;
-        activeDepartments: number;
-        departmentsByType: any[];
-        equipmentCountByDepartment: any[];
+        total: number;
+        active: number;
+        inactive: number;
+        byType: {};
     }>;
     findByEquipmentType(type: EquipmentType): Promise<Department[]>;
     findOne(id: string): Promise<Department>;

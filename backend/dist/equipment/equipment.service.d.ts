@@ -20,4 +20,5 @@ export declare class EquipmentService {
         byType: {};
         byStatus: {};
     }>;
+    findAllByType(type: string): Promise<Equipment[]>;
 }

@@ -8,7 +8,7 @@
           </div>
           <div class="hidden sm:ml-6 sm:flex sm:space-x-8">
             <router-link
-              v-for="item in navigationItems"
+              v-for="item in filteredNavigationItems"
               :key="item.path"
               :to="item.path"
               class="inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium"
@@ -48,6 +48,13 @@
               v-if="isProfileMenuOpen"
               class="origin-top-right absolute right-0 mt-2 w-48 rounded-md shadow-lg py-1 bg-white dark:bg-gray-800 ring-1 ring-black ring-opacity-5"
             >
+              <router-link
+                to="/dashboard/profile"
+                class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700"
+                @click="isProfileMenuOpen = false"
+              >
+                Mon profil
+              </router-link>
               <router-link
                 v-if="isAdmin"
                 to="/dashboard/admin/create"
@@ -110,31 +117,37 @@ export default {
         name: 'Tableau de bord',
         path: '/dashboard',
         icon: 'HomeIcon',
+        requiredRole: 'any'
       },
       {
         name: 'Sites',
         path: '/dashboard/sites',
         icon: 'BuildingOfficeIcon',
+        requiredRole: 'any'
       },
       {
         name: 'Équipements',
         path: '/dashboard/equipment',
         icon: 'WrenchScrewdriverIcon',
+        requiredRole: 'any'
       },
       {
         name: 'Départements',
         path: '/dashboard/departments',
         icon: 'BuildingLibraryIcon',
+        requiredRole: 'admin'
       },
       {
         name: 'Équipes',
         path: '/dashboard/teams',
         icon: 'UserGroupIcon',
+        requiredRole: 'any'
       },
       {
         name: 'Spécifications',
         path: '/dashboard/specifications',
         icon: 'DocumentTextIcon',
+        requiredRole: 'admin'
       }
     ];
 
@@ -147,6 +160,15 @@ export default {
       return authService.isAdmin();
     });
 
+    const filteredNavigationItems = computed(() => {
+      const isAdminUser = isAdmin.value;
+      
+      return navigationItems.filter(item => {
+        // Si l'élément est accessible à tous ou si l'utilisateur est admin
+        return item.requiredRole === 'any' || (item.requiredRole === 'admin' && isAdminUser);
+      });
+    });
+
     const logout = async () => {
       await authService.logout();
       router.push('/login');
@@ -154,6 +176,7 @@ export default {
 
     return {
       navigationItems,
+      filteredNavigationItems,
       isDarkMode,
       toggleTheme,
       isProfileMenuOpen,

@@ -16,6 +16,9 @@ exports.EquipmentController = void 0;
 const common_1 = require("@nestjs/common");
 const equipment_service_1 = require("./equipment.service");
 const equipment_dto_1 = require("../dto/equipment.dto");
+const jwt_auth_guard_1 = require("../auth/guards/jwt-auth.guard");
+const department_admin_guard_1 = require("../auth/guards/department-admin.guard");
+const swagger_1 = require("@nestjs/swagger");
 let EquipmentController = class EquipmentController {
     constructor(equipmentService) {
         this.equipmentService = equipmentService;
@@ -42,6 +45,7 @@ let EquipmentController = class EquipmentController {
 exports.EquipmentController = EquipmentController;
 __decorate([
     (0, common_1.Post)(),
+    (0, common_1.UseGuards)(department_admin_guard_1.DepartmentAdminGuard),
     (0, common_1.UsePipes)(new common_1.ValidationPipe({ transform: true })),
     __param(0, (0, common_1.Body)()),
     __metadata("design:type", Function),
@@ -50,6 +54,7 @@ __decorate([
 ], EquipmentController.prototype, "create", null);
 __decorate([
     (0, common_1.Get)(),
+    (0, common_1.UseGuards)(department_admin_guard_1.DepartmentAdminGuard),
     (0, common_1.UsePipes)(new common_1.ValidationPipe({ transform: true })),
     __param(0, (0, common_1.Query)()),
     __metadata("design:type", Function),
@@ -58,12 +63,14 @@ __decorate([
 ], EquipmentController.prototype, "findAll", null);
 __decorate([
     (0, common_1.Get)('statistics'),
+    (0, common_1.UseGuards)(department_admin_guard_1.DepartmentAdminGuard),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", []),
     __metadata("design:returntype", void 0)
 ], EquipmentController.prototype, "getStatistics", null);
 __decorate([
     (0, common_1.Get)(':id'),
+    (0, common_1.UseGuards)(department_admin_guard_1.DepartmentAdminGuard),
     __param(0, (0, common_1.Param)('id')),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String]),
@@ -71,6 +78,7 @@ __decorate([
 ], EquipmentController.prototype, "findOne", null);
 __decorate([
     (0, common_1.Patch)(':id'),
+    (0, common_1.UseGuards)(department_admin_guard_1.DepartmentAdminGuard),
     (0, common_1.UsePipes)(new common_1.ValidationPipe({ transform: true })),
     __param(0, (0, common_1.Param)('id')),
     __param(1, (0, common_1.Body)()),
@@ -80,13 +88,17 @@ __decorate([
 ], EquipmentController.prototype, "update", null);
 __decorate([
     (0, common_1.Delete)(':id'),
+    (0, common_1.UseGuards)(department_admin_guard_1.DepartmentAdminGuard),
     __param(0, (0, common_1.Param)('id')),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String]),
     __metadata("design:returntype", void 0)
 ], EquipmentController.prototype, "remove", null);
 exports.EquipmentController = EquipmentController = __decorate([
+    (0, swagger_1.ApiTags)('equipment'),
     (0, common_1.Controller)('equipment'),
+    (0, swagger_1.ApiBearerAuth)('JWT-auth'),
+    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
     __metadata("design:paramtypes", [equipment_service_1.EquipmentService])
 ], EquipmentController);
 //# sourceMappingURL=equipment.controller.js.map

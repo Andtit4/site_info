@@ -4,15 +4,17 @@
     <div class="lg:w-1/2">
       <div class="sm:flex sm:items-center">
         <div class="sm:flex-auto">
-          <h1 class="text-2xl font-semibold text-gray-900 dark:text-white">Sites</h1>
+          <h1 class="text-2xl font-semibold text-gray-900 dark:text-white">
+            Sites
+          </h1>
           <p class="mt-2 text-sm text-gray-700 dark:text-gray-300">
             Liste de tous les sites et leurs équipements associés.
           </p>
         </div>
         <div class="mt-4 sm:mt-0 sm:ml-16 sm:flex-none">
           <button
-            @click="openAddModal"
             class="inline-flex items-center justify-center rounded-md border border-transparent bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 sm:w-auto"
+            @click="openAddModal"
           >
             Ajouter un site
           </button>
@@ -24,13 +26,16 @@
         <div class="flex-1 min-w-0">
           <div class="relative rounded-md shadow-sm">
             <input
-              type="text"
               v-model="filters.search"
+              type="text"
               class="block w-full rounded-md border-gray-300 dark:border-gray-600 pr-10 focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm dark:bg-gray-700 dark:text-white"
               placeholder="Rechercher un site..."
-            />
+            >
             <div class="absolute inset-y-0 right-0 flex items-center pr-3">
-              <MagnifyingGlassIcon class="h-5 w-5 text-gray-400" aria-hidden="true" />
+              <MagnifyingGlassIcon
+                class="h-5 w-5 text-gray-400"
+                aria-hidden="true"
+              />
             </div>
           </div>
         </div>
@@ -39,8 +44,14 @@
             v-model="filters.region"
             class="block w-full rounded-md border-gray-300 dark:border-gray-600 py-2 pl-3 pr-10 text-base focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 sm:text-sm dark:bg-gray-700 dark:text-white"
           >
-            <option value="">Toutes les régions</option>
-            <option v-for="region in regions" :key="region" :value="region">
+            <option value="">
+              Toutes les régions
+            </option>
+            <option
+              v-for="region in regions"
+              :key="region"
+              :value="region"
+            >
               {{ region }}
             </option>
           </select>
@@ -48,8 +59,14 @@
             v-model="filters.status"
             class="block w-full rounded-md border-gray-300 dark:border-gray-600 py-2 pl-3 pr-10 text-base focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 sm:text-sm dark:bg-gray-700 dark:text-white"
           >
-            <option value="">Tous les statuts</option>
-            <option v-for="status in siteStatuses" :key="status" :value="status">
+            <option value="">
+              Tous les statuts
+            </option>
+            <option
+              v-for="status in siteStatuses"
+              :key="status"
+              :value="status"
+            >
               {{ getStatusLabel(status) }}
             </option>
           </select>
@@ -83,29 +100,47 @@
             </p>
             <dl class="mt-4 grid grid-cols-2 gap-4">
               <div>
-                <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Coordonnées</dt>
-                <dd class="mt-1 text-sm text-gray-900 dark:text-white">{{ site.latitude }}, {{ site.longitude }}</dd>
+                <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">
+                  Coordonnées
+                </dt>
+                <dd class="mt-1 text-sm text-gray-900 dark:text-white">
+                  {{ site.latitude }}, {{ site.longitude }}
+                </dd>
               </div>
               <div>
-                <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Équipements</dt>
+                <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">
+                  Équipements
+                </dt>
                 <dd class="mt-1 text-sm text-gray-900 dark:text-white">
                   <div class="flex items-center">
                     <span class="font-semibold">{{ site.equipment?.length || 0 }}</span>
                     <span class="ml-2 text-gray-500">équipements</span>
                   </div>
-                  <div v-if="site.equipment?.length > 0" class="mt-2 space-y-1">
-                    <div v-for="eq in site.equipment" :key="eq.id" class="text-xs">
+                  <div
+                    v-if="site.equipment?.length > 0"
+                    class="mt-2 space-y-1"
+                  >
+                    <div
+                      v-for="eq in site.equipment"
+                      :key="eq.id"
+                      class="text-xs"
+                    >
                       <span class="font-medium">{{ eq.id }}</span> - 
                       <span class="text-gray-500">{{ eq.type }}</span>
-                      <span :class="[
-                        'ml-2 px-1 py-0.5 text-xs rounded-full',
-                        getEquipmentStatusClass(eq.status)
-                      ]">
+                      <span
+                        :class="[
+                          'ml-2 px-1 py-0.5 text-xs rounded-full',
+                          getEquipmentStatusClass(eq.status)
+                        ]"
+                      >
                         {{ getEquipmentStatusLabel(eq.status) }}
                       </span>
                     </div>
                   </div>
-                  <div v-else class="mt-2 text-xs text-gray-500">
+                  <div
+                    v-else
+                    class="mt-2 text-xs text-gray-500"
+                  >
                     Aucun équipement
                   </div>
                 </dd>
@@ -113,14 +148,14 @@
             </dl>
             <div class="mt-6 flex justify-end space-x-3">
               <button
-                @click="viewSite(site)"
                 class="inline-flex items-center px-3 py-2 border border-gray-300 dark:border-gray-600 shadow-sm text-sm font-medium rounded-md text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                @click="viewSite(site)"
               >
                 Voir
               </button>
               <button
-                @click="editSite(site)"
                 class="inline-flex items-center px-3 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                @click="editSite(site)"
               >
                 Modifier
               </button>
@@ -132,7 +167,10 @@
 
     <!-- Détails du site -->
     <div class="lg:w-1/2">
-      <div v-if="selectedSite" class="bg-white dark:bg-gray-800 shadow rounded-lg p-6">
+      <div
+        v-if="selectedSite"
+        class="bg-white dark:bg-gray-800 shadow rounded-lg p-6"
+      >
         <div class="flex items-center justify-between mb-4">
           <h2 class="text-xl font-semibold text-gray-900 dark:text-white">
             {{ selectedSite.name }}
@@ -149,24 +187,38 @@
 
         <!-- Informations générales -->
         <div class="mb-6">
-          <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-2">Informations générales</h3>
+          <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-2">
+            Informations générales
+          </h3>
           <dl class="grid grid-cols-2 gap-4">
             <div>
-              <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">ID</dt>
-              <dd class="mt-1 text-sm text-gray-900 dark:text-white">{{ selectedSite.id }}</dd>
+              <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">
+                ID
+              </dt>
+              <dd class="mt-1 text-sm text-gray-900 dark:text-white">
+                {{ selectedSite.id }}
+              </dd>
             </div>
             <div>
-              <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Région</dt>
-              <dd class="mt-1 text-sm text-gray-900 dark:text-white">{{ selectedSite.region }}</dd>
+              <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">
+                Région
+              </dt>
+              <dd class="mt-1 text-sm text-gray-900 dark:text-white">
+                {{ selectedSite.region }}
+              </dd>
             </div>
             <div>
-              <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Coordonnées</dt>
+              <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">
+                Coordonnées
+              </dt>
               <dd class="mt-1 text-sm text-gray-900 dark:text-white">
                 {{ selectedSite.latitude }}, {{ selectedSite.longitude }}
               </dd>
             </div>
             <div>
-              <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Base</dt>
+              <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">
+                Base
+              </dt>
               <dd class="mt-1 text-sm text-gray-900 dark:text-white">
                 {{ selectedSite.oldBase ? `Ancienne: ${selectedSite.oldBase}` : '' }}
                 {{ selectedSite.newBase ? `Nouvelle: ${selectedSite.newBase}` : '' }}
@@ -177,8 +229,13 @@
 
         <!-- Carte du site -->
         <div class="mb-6">
-          <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-2">Localisation</h3>
-          <div v-if="selectedSite.latitude && selectedSite.longitude" class="h-96 w-full rounded-lg overflow-hidden shadow-md">
+          <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-2">
+            Localisation
+          </h3>
+          <div
+            v-if="selectedSite.latitude && selectedSite.longitude"
+            class="h-96 w-full rounded-lg overflow-hidden shadow-md"
+          >
             <site-map 
               :key="`map-${selectedSite.id}`" 
               :latitude="selectedSite.latitude" 
@@ -187,19 +244,34 @@
               :region="selectedSite.region"
             />
           </div>
-          <div v-else class="p-4 bg-gray-100 dark:bg-gray-700 rounded-lg text-center">
-            <p class="text-gray-500 dark:text-gray-400">Aucune coordonnée disponible pour ce site</p>
+          <div
+            v-else
+            class="p-4 bg-gray-100 dark:bg-gray-700 rounded-lg text-center"
+          >
+            <p class="text-gray-500 dark:text-gray-400">
+              Aucune coordonnée disponible pour ce site
+            </p>
           </div>
         </div>
 
         <!-- Équipements -->
         <div class="mb-6">
-          <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-2">Équipements</h3>
-          <div v-if="selectedSite.equipment?.length > 0" class="space-y-4">
-            <div v-for="eq in selectedSite.equipment" :key="eq.id" 
-              class="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
+          <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-2">
+            Équipements
+          </h3>
+          <div
+            v-if="selectedSite.equipment?.length > 0"
+            class="space-y-4"
+          >
+            <div
+              v-for="eq in selectedSite.equipment"
+              :key="eq.id" 
+              class="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg"
+            >
               <div class="flex items-center justify-between mb-2">
-                <h4 class="font-medium text-gray-900 dark:text-white">{{ eq.id }}</h4>
+                <h4 class="font-medium text-gray-900 dark:text-white">
+                  {{ eq.id }}
+                </h4>
                 <span
                   :class="[
                     'px-2 py-1 text-xs font-medium rounded-full',
@@ -211,55 +283,91 @@
               </div>
               <dl class="grid grid-cols-2 gap-2 text-sm">
                 <div>
-                  <dt class="text-gray-500 dark:text-gray-400">Type</dt>
-                  <dd class="text-gray-900 dark:text-white">{{ eq.type }}</dd>
+                  <dt class="text-gray-500 dark:text-gray-400">
+                    Type
+                  </dt>
+                  <dd class="text-gray-900 dark:text-white">
+                    {{ eq.type }}
+                  </dd>
                 </div>
                 <div>
-                  <dt class="text-gray-500 dark:text-gray-400">Modèle</dt>
-                  <dd class="text-gray-900 dark:text-white">{{ eq.model }}</dd>
+                  <dt class="text-gray-500 dark:text-gray-400">
+                    Modèle
+                  </dt>
+                  <dd class="text-gray-900 dark:text-white">
+                    {{ eq.model }}
+                  </dd>
                 </div>
                 <div>
-                  <dt class="text-gray-500 dark:text-gray-400">Date d'installation</dt>
-                  <dd class="text-gray-900 dark:text-white">{{ eq.installDate }}</dd>
+                  <dt class="text-gray-500 dark:text-gray-400">
+                    Date d'installation
+                  </dt>
+                  <dd class="text-gray-900 dark:text-white">
+                    {{ eq.installDate }}
+                  </dd>
                 </div>
                 <div>
-                  <dt class="text-gray-500 dark:text-gray-400">Dernière maintenance</dt>
-                  <dd class="text-gray-900 dark:text-white">{{ eq.lastMaintenanceDate || 'Non spécifiée' }}</dd>
+                  <dt class="text-gray-500 dark:text-gray-400">
+                    Dernière maintenance
+                  </dt>
+                  <dd class="text-gray-900 dark:text-white">
+                    {{ eq.lastMaintenanceDate || 'Non spécifiée' }}
+                  </dd>
                 </div>
               </dl>
             </div>
           </div>
-          <div v-else class="text-sm text-gray-500 dark:text-gray-400">
+          <div
+            v-else
+            class="text-sm text-gray-500 dark:text-gray-400"
+          >
             Aucun équipement sur ce site
           </div>
         </div>
 
         <!-- Équipes -->
         <div class="mb-6">
-          <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-2">Équipes assignées</h3>
-          <div v-if="siteTeams.length > 0" class="space-y-4">
-            <div v-for="team in siteTeams" :key="team.id" 
-              class="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
+          <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-2">
+            Équipes assignées
+          </h3>
+          <div
+            v-if="siteTeams.length > 0"
+            class="space-y-4"
+          >
+            <div
+              v-for="team in siteTeams"
+              :key="team.id" 
+              class="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg"
+            >
               <div class="flex items-center justify-between">
                 <div>
-                  <h4 class="font-medium text-gray-900 dark:text-white">{{ team.name }}</h4>
-                  <p class="text-sm text-gray-500 dark:text-gray-400">{{ team.equipmentType }}</p>
+                  <h4 class="font-medium text-gray-900 dark:text-white">
+                    {{ team.name }}
+                  </h4>
+                  <p class="text-sm text-gray-500 dark:text-gray-400">
+                    {{ team.equipmentType }}
+                  </p>
                 </div>
                 <button 
-                  @click="removeTeam(team.id)"
                   class="text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300"
+                  @click="removeTeam(team.id)"
                 >
                   Retirer
                 </button>
               </div>
             </div>
           </div>
-          <div v-else class="text-sm text-gray-500 dark:text-gray-400">
+          <div
+            v-else
+            class="text-sm text-gray-500 dark:text-gray-400"
+          >
             Aucune équipe assignée à ce site
           </div>
 
           <div class="mt-4">
-            <h4 class="text-md font-medium text-gray-900 dark:text-white mb-2">Assigner des équipes</h4>
+            <h4 class="text-md font-medium text-gray-900 dark:text-white mb-2">
+              Assigner des équipes
+            </h4>
             <select 
               v-model="selectedTeams" 
               multiple
@@ -275,15 +383,18 @@
               </option>
             </select>
             <button 
-              @click="assignTeams"
               class="mt-2 inline-flex items-center px-3 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+              @click="assignTeams"
             >
               Assigner les équipes sélectionnées
             </button>
           </div>
         </div>
       </div>
-      <div v-else class="bg-white dark:bg-gray-800 shadow rounded-lg p-6">
+      <div
+        v-else
+        class="bg-white dark:bg-gray-800 shadow rounded-lg p-6"
+      >
         <p class="text-gray-500 dark:text-gray-400 text-center">
           Sélectionnez un site pour voir ses détails
         </p>
@@ -296,74 +407,95 @@
       :title="modalTitle"
       @close="closeModal"
     >
-      <form @submit.prevent="handleSubmit" class="space-y-4">
+      <form
+        class="space-y-4"
+        @submit.prevent="handleSubmit"
+      >
         <div>
-          <label for="id" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+          <label
+            for="id"
+            class="block text-sm font-medium text-gray-700 dark:text-gray-300"
+          >
             ID du site
           </label>
           <input
-            type="text"
             id="id"
             v-model="form.id"
+            type="text"
             class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm dark:bg-gray-700 dark:text-white"
             :disabled="isEditing"
             required
-          />
+          >
         </div>
         <div>
-          <label for="name" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+          <label
+            for="name"
+            class="block text-sm font-medium text-gray-700 dark:text-gray-300"
+          >
             Nom
           </label>
           <input
-            type="text"
             id="name"
             v-model="form.name"
+            type="text"
             class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm dark:bg-gray-700 dark:text-white"
             required
-          />
+          >
         </div>
         <div>
-          <label for="region" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+          <label
+            for="region"
+            class="block text-sm font-medium text-gray-700 dark:text-gray-300"
+          >
             Région
           </label>
           <input
-            type="text"
             id="region"
             v-model="form.region"
+            type="text"
             class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm dark:bg-gray-700 dark:text-white"
             required
-          />
+          >
         </div>
         <div class="grid grid-cols-2 gap-4">
           <div>
-            <label for="latitude" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+            <label
+              for="latitude"
+              class="block text-sm font-medium text-gray-700 dark:text-gray-300"
+            >
               Latitude
             </label>
             <input
-              type="number"
               id="latitude"
               v-model="form.latitude"
+              type="number"
               step="0.000001"
               class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm dark:bg-gray-700 dark:text-white"
               required
-            />
+            >
           </div>
           <div>
-            <label for="longitude" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+            <label
+              for="longitude"
+              class="block text-sm font-medium text-gray-700 dark:text-gray-300"
+            >
               Longitude
             </label>
             <input
-              type="number"
               id="longitude"
               v-model="form.longitude"
+              type="number"
               step="0.000001"
               class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm dark:bg-gray-700 dark:text-white"
               required
-            />
+            >
           </div>
         </div>
         <div>
-          <label for="status" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+          <label
+            for="status"
+            class="block text-sm font-medium text-gray-700 dark:text-gray-300"
+          >
             Statut
           </label>
           <select
@@ -371,32 +503,42 @@
             v-model="form.status"
             class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm dark:bg-gray-700 dark:text-white"
           >
-            <option v-for="status in siteStatuses" :key="status" :value="status">
+            <option
+              v-for="status in siteStatuses"
+              :key="status"
+              :value="status"
+            >
               {{ getStatusLabel(status) }}
             </option>
           </select>
         </div>
         <div>
-          <label for="oldBase" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+          <label
+            for="oldBase"
+            class="block text-sm font-medium text-gray-700 dark:text-gray-300"
+          >
             Ancienne base
           </label>
           <input
-            type="text"
             id="oldBase"
             v-model="form.oldBase"
+            type="text"
             class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm dark:bg-gray-700 dark:text-white"
-          />
+          >
         </div>
         <div>
-          <label for="newBase" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+          <label
+            for="newBase"
+            class="block text-sm font-medium text-gray-700 dark:text-gray-300"
+          >
             Nouvelle base
           </label>
           <input
-            type="text"
             id="newBase"
             v-model="form.newBase"
+            type="text"
             class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm dark:bg-gray-700 dark:text-white"
-          />
+          >
         </div>
         <div class="mt-5 sm:mt-6 sm:grid sm:grid-cols-2 sm:gap-3">
           <button
@@ -407,8 +549,8 @@
           </button>
           <button
             type="button"
-            @click="closeModal"
             class="mt-3 inline-flex w-full justify-center rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-4 py-2 text-base font-medium text-gray-700 dark:text-gray-200 shadow-sm hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 sm:mt-0 sm:text-sm"
+            @click="closeModal"
           >
             Annuler
           </button>

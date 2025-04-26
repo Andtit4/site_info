@@ -1,6 +1,7 @@
 import { Injectable, NotFoundException, ConflictException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, Like, In } from 'typeorm';
+import { Repository, Like, In, FindOptionsWhere } from 'typeorm';
+import { v4 as uuidv4 } from 'uuid';
 import { Equipment, EquipmentType, EquipmentStatus } from '../entities/equipment.entity';
 import { CreateEquipmentDto, UpdateEquipmentDto, EquipmentFilterDto } from '../dto/equipment.dto';
 import { SitesService } from '../sites/sites.service';
@@ -31,7 +32,7 @@ export class EquipmentService {
     }
 
     if (type && type.length > 0) {
-      query.andWhere('equipment.type IN (:...type)', { type });
+      query.andWhere('equipment.name IN (:...type)', { type });
     }
 
     if (status && status.length > 0) {
@@ -124,7 +125,6 @@ export class EquipmentService {
   }
 
   // utilitaire pour obtenir des statistiques des equipements
-  // Todo aller dans la partie Team mettre les statistiques pour cette partie.
   async getStatistics() {
     // Nombre total d'equipements
     const totalEquipment = await this.equipmentRepository.count();
@@ -133,7 +133,7 @@ export class EquipmentService {
     const typeCounts = {};
     for (const type in EquipmentType) {
       const count = await this.equipmentRepository.count({
-        where: { type: EquipmentType[type] },
+        where: { name: EquipmentType[type] }, // Utiliser name au lieu de type
       });
       typeCounts[EquipmentType[type]] = count;
     }
@@ -152,5 +152,17 @@ export class EquipmentService {
       byType: typeCounts,
       byStatus: statusCounts,
     };
+  }
+
+  async findAllByType(type: string): Promise<Equipment[]> {
+    // Vérifier que le type demandé existe dans l'énumération
+    if (!Object.keys(EquipmentType).includes(type)) {
+      throw new NotFoundException(`Type d'équipement ${type} invalide`);
+    }
+
+    return this.equipmentRepository.find({
+      where: { name: EquipmentType[type] }, // Utiliser name au lieu de type
+      relations: ['site', 'department'],
+    });
   }
 } 

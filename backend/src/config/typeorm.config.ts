@@ -14,6 +14,15 @@ export const AppDataSource = new DataSource({
   synchronize: false,
   logging: true,
   charset: 'utf8mb4_unicode_ci',
+  connectTimeout: 60000,
+  acquireTimeout: 60000,
+  extra: {
+    connectionLimit: 20,
+    maxIdle: 10,
+    idleTimeout: 60000,
+    enableKeepAlive: true,
+    keepAliveInitialDelay: 30000
+  }
 });
 
 // Configuration function for NestJS
@@ -29,4 +38,13 @@ export const typeOrmConfig = (configService: ConfigService): DataSourceOptions =
   synchronize: false,
   logging: true,
   charset: 'utf8mb4_unicode_ci',
+  connectTimeout: 60000,
+  acquireTimeout: 60000,
+  extra: {
+    connectionLimit: 20,
+    maxIdle: 10,
+    idleTimeout: 60000,
+    enableKeepAlive: true,
+    keepAliveInitialDelay: 30000
+  }
 }); 

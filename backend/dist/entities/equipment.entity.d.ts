@@ -1,6 +1,5 @@
 import { Site } from './site.entity';
 import { Department } from './department.entity';
-import { Team } from '../teams/entities/team.entity';
 export declare enum EquipmentType {
     ANTENNA = "ANTENNE",
     ROUTER = "ROUTEUR",
@@ -20,17 +19,24 @@ export declare enum EquipmentStatus {
 }
 export declare class Equipment {
     id: string;
-    type: string;
+    name: string;
+    description: string;
     model: string;
-    manufacturer: string;
     serialNumber: string;
+    manufacturer: string;
+    purchaseDate: Date;
     installDate: Date;
     lastMaintenanceDate: Date;
     status: string;
-    specifications: Record<string, string>;
+    location: string;
+    purchasePrice: number;
+    warrantyExpiration: Date;
+    ipAddress: string;
+    macAddress: string;
     site: Site;
     siteId: string;
     department: Department;
     departmentId: string;
-    teams: Team[];
+    createdAt: Date;
+    updatedAt: Date;
 }

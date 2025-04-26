@@ -36,7 +36,7 @@ let EquipmentService = class EquipmentService {
             query.andWhere('(equipment.model LIKE :search OR equipment.manufacturer LIKE :search OR equipment.serialNumber LIKE :search)', { search: `%${search}%` });
         }
         if (type && type.length > 0) {
-            query.andWhere('equipment.type IN (:...type)', { type });
+            query.andWhere('equipment.name IN (:...type)', { type });
         }
         if (status && status.length > 0) {
             query.andWhere('equipment.status IN (:...status)', { status });
@@ -98,7 +98,7 @@ let EquipmentService = class EquipmentService {
         const typeCounts = {};
         for (const type in equipment_entity_1.EquipmentType) {
             const count = await this.equipmentRepository.count({
-                where: { type: equipment_entity_1.EquipmentType[type] },
+                where: { name: equipment_entity_1.EquipmentType[type] },
             });
             typeCounts[equipment_entity_1.EquipmentType[type]] = count;
         }
@@ -114,6 +114,15 @@ let EquipmentService = class EquipmentService {
             byType: typeCounts,
             byStatus: statusCounts,
         };
+    }
+    async findAllByType(type) {
+        if (!Object.keys(equipment_entity_1.EquipmentType).includes(type)) {
+            throw new common_1.NotFoundException(`Type d'équipement ${type} invalide`);
+        }
+        return this.equipmentRepository.find({
+            where: { name: equipment_entity_1.EquipmentType[type] },
+            relations: ['site', 'department'],
+        });
     }
 };
 exports.EquipmentService = EquipmentService;

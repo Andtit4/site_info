@@ -1,12 +1,16 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Query, UsePipes, ValidationPipe, Put } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Query, UsePipes, ValidationPipe, Put, UseGuards } from '@nestjs/common';
 import { SitesService } from './sites.service';
 import { CreateSiteDto, UpdateSiteDto, SiteFilterDto } from '../dto/site.dto';
 import { Site } from '../entities/site.entity';
 import { ApiTags, ApiOperation, ApiResponse, ApiParam, ApiQuery, ApiBody, ApiBearerAuth } from '@nestjs/swagger';
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { AdminGuard } from '../auth/guards/admin.guard';
+import { DepartmentAdminGuard } from '../auth/guards/department-admin.guard';
 
 @ApiTags('sites')
 @Controller('sites')
 @ApiBearerAuth('JWT-auth')
+@UseGuards(JwtAuthGuard)
 export class SitesController {
   constructor(private readonly sitesService: SitesService) {}
 
@@ -16,6 +20,7 @@ export class SitesController {
   @ApiResponse({ status: 400, description: 'Requête invalide' })
   @ApiResponse({ status: 401, description: 'Non autorisé' })
   @Post()
+  @UseGuards(AdminGuard)
   @UsePipes(new ValidationPipe({ transform: true }))
   create(@Body() createSiteDto: CreateSiteDto) {
     return this.sitesService.create(createSiteDto);
@@ -26,6 +31,7 @@ export class SitesController {
   @ApiResponse({ status: 200, description: 'Liste des sites récupérée avec succès', type: [Site] })
   @ApiResponse({ status: 401, description: 'Non autorisé' })
   @Get()
+  @UseGuards(DepartmentAdminGuard)
   @UsePipes(new ValidationPipe({ transform: true }))
   findAll(@Query() filterDto: SiteFilterDto) {
     return this.sitesService.findAll(filterDto);
@@ -35,6 +41,7 @@ export class SitesController {
   @ApiResponse({ status: 200, description: 'Statistiques récupérées avec succès' })
   @ApiResponse({ status: 401, description: 'Non autorisé' })
   @Get('statistics')
+  @UseGuards(DepartmentAdminGuard)
   getStatistics() {
     return this.sitesService.getStatistics();
   }
@@ -45,6 +52,7 @@ export class SitesController {
   @ApiResponse({ status: 404, description: 'Site non trouvé' })
   @ApiResponse({ status: 401, description: 'Non autorisé' })
   @Get(':id')
+  @UseGuards(DepartmentAdminGuard)
   findOne(@Param('id') id: string) {
     return this.sitesService.findOne(id);
   }
@@ -57,6 +65,7 @@ export class SitesController {
   @ApiResponse({ status: 400, description: 'Requête invalide' })
   @ApiResponse({ status: 401, description: 'Non autorisé' })
   @Patch(':id')
+  @UseGuards(AdminGuard)
   @UsePipes(new ValidationPipe({ transform: true }))
   update(@Param('id') id: string, @Body() updateSiteDto: UpdateSiteDto) {
     return this.sitesService.update(id, updateSiteDto);
@@ -68,6 +77,7 @@ export class SitesController {
   @ApiResponse({ status: 404, description: 'Site non trouvé' })
   @ApiResponse({ status: 401, description: 'Non autorisé' })
   @Delete(':id')
+  @UseGuards(AdminGuard)
   remove(@Param('id') id: string) {
     return this.sitesService.remove(id);
   }
@@ -92,6 +102,7 @@ export class SitesController {
   @ApiResponse({ status: 404, description: 'Site ou équipe non trouvé' })
   @ApiResponse({ status: 401, description: 'Non autorisé' })
   @Put(':id/teams')
+  @UseGuards(DepartmentAdminGuard)
   async assignTeams(
     @Param('id') id: string,
     @Body() body: { teamIds: string[] }
@@ -119,6 +130,7 @@ export class SitesController {
   @ApiResponse({ status: 404, description: 'Site non trouvé' })
   @ApiResponse({ status: 401, description: 'Non autorisé' })
   @Delete(':id/teams')
+  @UseGuards(DepartmentAdminGuard)
   async removeTeams(
     @Param('id') id: string,
     @Body() body: { teamIds: string[] }
@@ -132,6 +144,7 @@ export class SitesController {
   @ApiResponse({ status: 404, description: 'Site non trouvé' })
   @ApiResponse({ status: 401, description: 'Non autorisé' })
   @Get(':id/teams')
+  @UseGuards(DepartmentAdminGuard)
   async getSiteTeams(@Param('id') id: string) {
     return this.sitesService.getSiteTeams(id);
   }

@@ -18,6 +18,8 @@ export declare class AuthService {
             lastName: any;
             email: any;
             isAdmin: any;
+            isDepartmentAdmin: any;
+            departmentId: any;
         };
     }>;
     countAdmins(): Promise<number>;

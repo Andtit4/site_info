@@ -1,5 +1,6 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, BeforeInsert } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, BeforeInsert, ManyToOne, JoinColumn } from 'typeorm';
 import { v4 as uuidv4 } from 'uuid';
+import { Department } from './department.entity';
 
 @Entity('users')
 export class User {
@@ -31,11 +32,21 @@ export class User {
   @Column({ name: 'isAdmin', type: 'boolean', default: false })
   isAdmin: boolean;
 
+  @Column({ name: 'isDepartmentAdmin', type: 'boolean', default: false })
+  isDepartmentAdmin: boolean;
+
   @Column({ name: 'isActive', type: 'boolean', default: true })
   isActive: boolean;
 
   @Column({ nullable: true })
   lastLogin: Date;
+
+  @ManyToOne(() => Department, { nullable: true })
+  @JoinColumn({ name: 'departmentId' })
+  department: Department;
+
+  @Column({ nullable: true })
+  departmentId: string;
 
   @CreateDateColumn()
   createdAt: Date;

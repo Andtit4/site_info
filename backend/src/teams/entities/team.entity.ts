@@ -79,6 +79,17 @@ export class Team {
   })
   sites: Site[];
 
-  @ManyToMany(() => Equipment, equipment => equipment.teams)
+  @ManyToMany(() => Equipment)
+  @JoinTable({
+    name: 'team_equipment',
+    joinColumn: {
+      name: 'teamId',
+      referencedColumnName: 'id',
+    },
+    inverseJoinColumn: {
+      name: 'equipmentId',
+      referencedColumnName: 'id',
+    },
+  })
   equipment: Equipment[];
 } 

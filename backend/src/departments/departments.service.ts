@@ -2,8 +2,13 @@ import { Injectable, NotFoundException, ConflictException, Logger } from '@nestj
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, Like } from 'typeorm';
 import { Department } from '../entities/department.entity';
+import { User } from '../entities/user.entity';
 import { CreateDepartmentDto, UpdateDepartmentDto, DepartmentFilterDto } from '../dto/department.dto';
 import { EquipmentType } from '../entities/equipment.entity';
+import { EmailService } from '../services/email.service';
+import { CreateDepartmentUserDto } from '../auth/dto/create-department-user.dto';
+import { UsersService } from '../users/users.service';
+import { v4 as uuidv4 } from 'uuid';
 
 @Injectable()
 export class DepartmentsService {
@@ -12,6 +17,8 @@ export class DepartmentsService {
   constructor(
     @InjectRepository(Department)
     private departmentsRepository: Repository<Department>,
+    private usersService: UsersService,
+    private emailService: EmailService,
   ) {}
 
   async create(createDepartmentDto: CreateDepartmentDto): Promise<Department> {
@@ -35,6 +42,11 @@ export class DepartmentsService {
       
       const savedDepartment = await this.departmentsRepository.save(department);
       
+      // Créer un compte utilisateur pour le département si demandé
+      if (createDepartmentDto.createAccount !== false) {
+        await this.createDepartmentUser(savedDepartment, createDepartmentDto.password);
+      }
+      
       // Reconvertir la chaîne en tableau pour la réponse
       if (savedDepartment.managedEquipmentTypes && typeof savedDepartment.managedEquipmentTypes === 'string') {
         savedDepartment.managedEquipmentTypes = (savedDepartment.managedEquipmentTypes as string)
@@ -48,6 +60,54 @@ export class DepartmentsService {
       this.logger.error(`Erreur lors de la création du département: ${error.message}`, error.stack);
       throw error;
     }
+  }
+
+  private async createDepartmentUser(department: Department, providedPassword?: string): Promise<void> {
+    try {
+      // Générer un nom d'utilisateur basé sur le nom du département
+      const username = `dept_${department.name.toLowerCase().replace(/[^a-z0-9]/g, '_')}`;
+      
+      // Utiliser le mot de passe fourni ou en générer un aléatoire
+      const password = providedPassword || this.generateRandomPassword();
+      
+      // Créer le DTO pour l'utilisateur du département
+      const createUserDto: CreateDepartmentUserDto = {
+        username,
+        password,
+        email: department.contactEmail,
+        firstName: department.responsibleName.split(' ')[0] || 'Admin',
+        lastName: department.responsibleName.split(' ').slice(1).join(' ') || department.name,
+        departmentId: department.id
+      };
+      
+      // Créer l'utilisateur du département
+      const user = await this.usersService.createDepartmentUser(createUserDto);
+      
+      // Envoyer un email avec les identifiants
+      await this.emailService.sendCredentialsEmail(
+        department.contactEmail,
+        username,
+        password,
+        createUserDto.firstName,
+        createUserDto.lastName,
+        true
+      );
+      
+      this.logger.log(`Compte utilisateur créé pour le département: ${department.name}`);
+    } catch (error) {
+      this.logger.error(`Erreur lors de la création du compte pour le département ${department.id}: ${error.message}`);
+      // Ne pas bloquer la création du département si la création du compte échoue
+    }
+  }
+
+  private generateRandomPassword(): string {
+    // Générer un mot de passe aléatoire (12 caractères)
+    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*';
+    let password = '';
+    for (let i = 0; i < 12; i++) {
+      password += chars.charAt(Math.floor(Math.random() * chars.length));
+    }
+    return password;
   }
 
   async findAll(filterDto: DepartmentFilterDto = {}): Promise<Department[]> {
@@ -199,27 +259,23 @@ export class DepartmentsService {
     try {
       const totalDepartments = await this.departmentsRepository.count();
       const activeDepartments = await this.departmentsRepository.count({ where: { isActive: true } });
+      const inactiveDepartments = await this.departmentsRepository.count({ where: { isActive: false } });
       
-      const departmentsByType = await this.departmentsRepository
-        .createQueryBuilder('department')
-        .select('department.type', 'type')
-        .addSelect('COUNT(department.id)', 'count')
-        .groupBy('department.type')
-        .getRawMany();
-      
-      const equipmentCountByDepartment = await this.departmentsRepository
-        .createQueryBuilder('department')
-        .leftJoinAndSelect('department.equipment', 'equipment')
-        .select('department.name', 'departmentName')
-        .addSelect('COUNT(equipment.id)', 'equipmentCount')
-        .groupBy('department.name')
-        .getRawMany();
+      // Compter par type
+      const departmentsByType = {};
+      for (const type of Object.values(EquipmentType)) {
+        departmentsByType[type] = await this.departmentsRepository.count({
+          where: {
+            type: type as any
+          }
+        });
+      }
       
       return {
-        totalDepartments,
-        activeDepartments,
-        departmentsByType,
-        equipmentCountByDepartment
+        total: totalDepartments,
+        active: activeDepartments,
+        inactive: inactiveDepartments,
+        byType: departmentsByType
       };
     } catch (error) {
       this.logger.error(`Erreur lors de la récupération des statistiques: ${error.message}`, error.stack);

@@ -1,3 +1,4 @@
+import { Department } from './department.entity';
 export declare class User {
     id: string;
     generateId(): void;
@@ -7,8 +8,11 @@ export declare class User {
     lastName: string;
     email: string;
     isAdmin: boolean;
+    isDepartmentAdmin: boolean;
     isActive: boolean;
     lastLogin: Date;
+    department: Department;
+    departmentId: string;
     createdAt: Date;
     updatedAt: Date;
 }

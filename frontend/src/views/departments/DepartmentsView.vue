@@ -255,6 +255,51 @@
             </div>
           </div>
 
+          <!-- Informations de connexion -->
+          <div v-if="!isEditing" class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm">
+            <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-4">
+              Informations de connexion
+              <span class="text-sm text-gray-500 ml-2">(optionnel)</span>
+            </h3>
+            <div class="space-y-4">
+              <div class="flex items-center mb-4">
+                <input
+                  type="checkbox"
+                  id="createAccount"
+                  v-model="form.createAccount"
+                  class="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500 dark:border-gray-600 dark:bg-gray-700"
+                />
+                <label for="createAccount" class="ml-2 text-sm text-gray-700 dark:text-gray-300">
+                  Créer un compte utilisateur pour ce département
+                </label>
+              </div>
+              
+              <p class="text-sm text-gray-500 dark:text-gray-400">
+                Si vous activez cette option, un compte sera créé pour le département lui permettant de se connecter à l'application.
+                <br>
+                Le nom d'utilisateur sera généré automatiquement à partir du nom du département et les identifiants seront envoyés à l'adresse email indiquée.
+              </p>
+              
+              <div v-if="form.createAccount">
+                <div>
+                  <label for="password" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                    Mot de passe <span class="text-sm text-gray-500">(optionnel - si non fourni, un mot de passe sera généré automatiquement)</span>
+                  </label>
+                  <input
+                    type="password"
+                    id="password"
+                    v-model="form.password"
+                    class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm dark:bg-gray-700 dark:text-white"
+                    minlength="8"
+                  />
+                  <p class="mt-1 text-sm text-gray-500">
+                    Si vous ne renseignez pas de mot de passe, un mot de passe aléatoire sécurisé sera généré automatiquement.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+
           <!-- Boutons d'action -->
           <div class="flex justify-center space-x-3">
             <button
@@ -331,7 +376,9 @@ export default {
       contactEmail: '',
       contactPhone: '',
       isActive: true,
-      managedEquipmentTypes: []
+      managedEquipmentTypes: [],
+      createAccount: false,
+      password: ''
     });
 
     const modalTitle = computed(() => 
@@ -399,7 +446,9 @@ export default {
         contactEmail: '',
         contactPhone: '',
         isActive: true,
-        managedEquipmentTypes: []
+        managedEquipmentTypes: [],
+        createAccount: false,
+        password: ''
       };
       showModal.value = true;
     };
@@ -433,7 +482,9 @@ export default {
             contactEmail: form.value.contactEmail,
             contactPhone: form.value.contactPhone ? Number(form.value.contactPhone) : null,
             isActive: form.value.isActive,
-            managedEquipmentTypes: form.value.managedEquipmentTypes
+            managedEquipmentTypes: form.value.managedEquipmentTypes,
+            createAccount: form.value.createAccount,
+            password: form.value.password
           };
           await departmentsApi.update(currentDepartment.value.id, cleanedData);
         } else {

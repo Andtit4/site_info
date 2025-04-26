@@ -9,6 +9,8 @@ export declare class CreateDepartmentDto {
     contactPhone?: number;
     isActive?: boolean;
     managedEquipmentTypes?: EquipmentType[];
+    password?: string;
+    createAccount?: boolean;
 }
 export declare class UpdateDepartmentDto {
     name?: string;

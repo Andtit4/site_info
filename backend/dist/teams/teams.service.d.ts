@@ -3,10 +3,14 @@ import { Team } from './entities/team.entity';
 import { CreateTeamDto, UpdateTeamDto, TeamFilterDto } from './dto/team.dto';
 import { DepartmentsService } from '../departments/departments.service';
 import { EquipmentType } from '../entities/equipment.entity';
+import { Request } from 'express';
 export declare class TeamsService {
     private teamsRepository;
     private departmentsService;
-    constructor(teamsRepository: Repository<Team>, departmentsService: DepartmentsService);
+    private request;
+    constructor(teamsRepository: Repository<Team>, departmentsService: DepartmentsService, request: Request);
+    private getCurrentUser;
+    private applyDepartmentFilter;
     create(createTeamDto: CreateTeamDto): Promise<Team>;
     findAll(filterDto?: TeamFilterDto): Promise<Team[]>;
     findByDepartment(departmentId: string): Promise<Team[]>;

@@ -14,6 +14,15 @@ exports.AppDataSource = new typeorm_1.DataSource({
     synchronize: false,
     logging: true,
     charset: 'utf8mb4_unicode_ci',
+    connectTimeout: 60000,
+    acquireTimeout: 60000,
+    extra: {
+        connectionLimit: 20,
+        maxIdle: 10,
+        idleTimeout: 60000,
+        enableKeepAlive: true,
+        keepAliveInitialDelay: 30000
+    }
 });
 const typeOrmConfig = (configService) => ({
     type: 'mysql',
@@ -27,6 +36,15 @@ const typeOrmConfig = (configService) => ({
     synchronize: false,
     logging: true,
     charset: 'utf8mb4_unicode_ci',
+    connectTimeout: 60000,
+    acquireTimeout: 60000,
+    extra: {
+        connectionLimit: 20,
+        maxIdle: 10,
+        idleTimeout: 60000,
+        enableKeepAlive: true,
+        keepAliveInitialDelay: 30000
+    }
 });
 exports.typeOrmConfig = typeOrmConfig;
 //# sourceMappingURL=typeorm.config.js.map

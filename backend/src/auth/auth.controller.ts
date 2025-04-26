@@ -4,6 +4,7 @@ import { LoginDto } from './dto/login.dto';
 import { LocalAuthGuard } from './guards/local-auth.guard';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { CreateAdminDto } from './dto/create-admin.dto';
+import { CreateDepartmentUserDto } from './dto/create-department-user.dto';
 import { UsersService } from '../users/users.service';
 import { AdminGuard } from './guards/admin.guard';
 import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth, ApiBody, ApiQuery } from '@nestjs/swagger';
@@ -56,6 +57,29 @@ export class AuthController {
       lastName: admin.lastName,
       isAdmin: admin.isAdmin,
       createdAt: admin.createdAt
+    };
+  }
+
+  @ApiOperation({ summary: 'Créer un utilisateur de département', description: 'Permet à un administrateur de créer un utilisateur lié à un département' })
+  @ApiBody({ type: CreateDepartmentUserDto })
+  @ApiResponse({ status: 201, description: 'Utilisateur de département créé avec succès' })
+  @ApiResponse({ status: 401, description: 'Non autorisé - Token JWT manquant ou invalide' })
+  @ApiResponse({ status: 403, description: 'Interdit - L\'utilisateur n\'est pas administrateur' })
+  @ApiBearerAuth('JWT-auth')
+  @UseGuards(JwtAuthGuard, AdminGuard)
+  @Post('department/create')
+  @HttpCode(HttpStatus.CREATED)
+  async createDepartmentUser(@Body() createDepartmentUserDto: CreateDepartmentUserDto) {
+    const departmentUser = await this.usersService.createDepartmentUser(createDepartmentUserDto);
+    return {
+      id: departmentUser.id,
+      username: departmentUser.username,
+      email: departmentUser.email,
+      firstName: departmentUser.firstName,
+      lastName: departmentUser.lastName,
+      isDepartmentAdmin: departmentUser.isDepartmentAdmin,
+      departmentId: departmentUser.departmentId,
+      createdAt: departmentUser.createdAt
     };
   }
 

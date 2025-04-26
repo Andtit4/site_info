@@ -12,6 +12,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.User = void 0;
 const typeorm_1 = require("typeorm");
 const uuid_1 = require("uuid");
+const department_entity_1 = require("./department.entity");
 let User = class User {
     generateId() {
         if (!this.id) {
@@ -55,6 +56,10 @@ __decorate([
     __metadata("design:type", Boolean)
 ], User.prototype, "isAdmin", void 0);
 __decorate([
+    (0, typeorm_1.Column)({ name: 'isDepartmentAdmin', type: 'boolean', default: false }),
+    __metadata("design:type", Boolean)
+], User.prototype, "isDepartmentAdmin", void 0);
+__decorate([
     (0, typeorm_1.Column)({ name: 'isActive', type: 'boolean', default: true }),
     __metadata("design:type", Boolean)
 ], User.prototype, "isActive", void 0);
@@ -62,6 +67,15 @@ __decorate([
     (0, typeorm_1.Column)({ nullable: true }),
     __metadata("design:type", Date)
 ], User.prototype, "lastLogin", void 0);
+__decorate([
+    (0, typeorm_1.ManyToOne)(() => department_entity_1.Department, { nullable: true }),
+    (0, typeorm_1.JoinColumn)({ name: 'departmentId' }),
+    __metadata("design:type", department_entity_1.Department)
+], User.prototype, "department", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ nullable: true }),
+    __metadata("design:type", String)
+], User.prototype, "departmentId", void 0);
 __decorate([
     (0, typeorm_1.CreateDateColumn)(),
     __metadata("design:type", Date)

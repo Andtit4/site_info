@@ -106,7 +106,18 @@ __decorate([
     __metadata("design:type", Array)
 ], Team.prototype, "sites", void 0);
 __decorate([
-    (0, typeorm_1.ManyToMany)(() => equipment_entity_1.Equipment, equipment => equipment.teams),
+    (0, typeorm_1.ManyToMany)(() => equipment_entity_1.Equipment),
+    (0, typeorm_1.JoinTable)({
+        name: 'team_equipment',
+        joinColumn: {
+            name: 'teamId',
+            referencedColumnName: 'id',
+        },
+        inverseJoinColumn: {
+            name: 'equipmentId',
+            referencedColumnName: 'id',
+        },
+    }),
     __metadata("design:type", Array)
 ], Team.prototype, "equipment", void 0);
 exports.Team = Team = __decorate([

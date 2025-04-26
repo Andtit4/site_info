@@ -12,14 +12,19 @@ const typeorm_1 = require("@nestjs/typeorm");
 const department_entity_1 = require("../entities/department.entity");
 const departments_service_1 = require("./departments.service");
 const departments_controller_1 = require("./departments.controller");
+const users_module_1 = require("../users/users.module");
+const email_service_1 = require("../services/email.service");
 let DepartmentsModule = class DepartmentsModule {
 };
 exports.DepartmentsModule = DepartmentsModule;
 exports.DepartmentsModule = DepartmentsModule = __decorate([
     (0, common_1.Module)({
-        imports: [typeorm_1.TypeOrmModule.forFeature([department_entity_1.Department])],
+        imports: [
+            typeorm_1.TypeOrmModule.forFeature([department_entity_1.Department]),
+            users_module_1.UsersModule,
+        ],
         controllers: [departments_controller_1.DepartmentsController],
-        providers: [departments_service_1.DepartmentsService],
+        providers: [departments_service_1.DepartmentsService, email_service_1.EmailService],
         exports: [departments_service_1.DepartmentsService],
     })
 ], DepartmentsModule);

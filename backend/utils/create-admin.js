@@ -7,7 +7,7 @@ async function main() {
     console.log('Création d\'un compte administrateur...');
 
     // Paramètres de l'administrateur
-    const adminUsername = 'admin';
+    const adminUsername = 'admin2'; // Changé pour éviter le conflit
     const adminPassword = 'Admin123!'; // Ce mot de passe sera hashé
     const adminFirstName = 'Admin';
     const adminLastName = 'System';
@@ -25,16 +25,13 @@ async function main() {
     try {
         console.log('Connexion à la base de données établie');
 
-        // Vérifier si l'administrateur existe déjà
-        const [existingAdmins] = await connection.query(
-            'SELECT * FROM users WHERE username = ? OR isAdmin = 1', [adminUsername]
+        // Vérifier si le nom d'utilisateur existe déjà
+        const [existingUser] = await connection.query(
+            'SELECT * FROM users WHERE username = ?', [adminUsername]
         );
 
-        if (existingAdmins.length > 0) {
-            console.log('Un administrateur existe déjà dans la base de données');
-            for (const admin of existingAdmins) {
-                console.log(`- ${admin.username} (isAdmin: ${admin.isAdmin === 1 ? 'Oui' : 'Non'})`);
-            }
+        if (existingUser.length > 0) {
+            console.log(`Un utilisateur avec le nom '${adminUsername}' existe déjà dans la base de données`);
             return;
         }
 

@@ -32,7 +32,14 @@ export class AuthService {
       throw new UnauthorizedException('Identifiants invalides');
     }
 
-    const payload = { username: user.username, sub: user.id, isAdmin: user.isAdmin };
+    const payload = { 
+      username: user.username, 
+      sub: user.id, 
+      isAdmin: user.isAdmin,
+      isDepartmentAdmin: user.isDepartmentAdmin,
+      departmentId: user.departmentId
+    };
+    
     return {
       access_token: this.jwtService.sign(payload),
       user: {
@@ -41,7 +48,9 @@ export class AuthService {
         firstName: user.firstName,
         lastName: user.lastName,
         email: user.email,
-        isAdmin: user.isAdmin
+        isAdmin: user.isAdmin,
+        isDepartmentAdmin: user.isDepartmentAdmin,
+        departmentId: user.departmentId
       }
     };
   }
