@@ -53,7 +53,7 @@ export class Equipment {
   @Column({ nullable: true })
   lastMaintenanceDate: Date;
 
-  @Column({ 
+  @Column({
     type: 'varchar',
     default: 'ACTIF'
   })

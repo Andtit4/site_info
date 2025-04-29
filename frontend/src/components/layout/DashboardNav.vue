@@ -162,9 +162,7 @@ export default {
 
     const filteredNavigationItems = computed(() => {
       const isAdminUser = isAdmin.value;
-      
       return navigationItems.filter(item => {
-        // Si l'élément est accessible à tous ou si l'utilisateur est admin
         return item.requiredRole === 'any' || (item.requiredRole === 'admin' && isAdminUser);
       });
     });

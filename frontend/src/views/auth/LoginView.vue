@@ -1,9 +1,17 @@
 <template>
-  <div class="login-container" :class="{ 'dark': isDarkMode }">
+  <div
+    class="login-container"
+    :class="{ 'dark': isDarkMode }"
+  >
     <div class="login-card">
-      <h1 class="login-title">Connexion</h1>
+      <h1 class="login-title">
+        Connexion
+      </h1>
       
-      <form @submit.prevent="handleLogin" class="login-form">
+      <form
+        class="login-form"
+        @submit.prevent="handleLogin"
+      >
         <div class="form-group">
           <label for="username">Nom d'utilisateur</label>
           <input
@@ -13,8 +21,11 @@
             required
             class="form-control"
             :class="{ 'is-invalid': errors.username }"
-          />
-          <div v-if="errors.username" class="invalid-feedback">
+          >
+          <div
+            v-if="errors.username"
+            class="invalid-feedback"
+          >
             {{ errors.username }}
           </div>
         </div>
@@ -28,13 +39,19 @@
             required
             class="form-control"
             :class="{ 'is-invalid': errors.password }"
-          />
-          <div v-if="errors.password" class="invalid-feedback">
+          >
+          <div
+            v-if="errors.password"
+            class="invalid-feedback"
+          >
             {{ errors.password }}
           </div>
         </div>
 
-        <div v-if="error" class="alert alert-danger">
+        <div
+          v-if="error"
+          class="alert alert-danger"
+        >
           {{ error }}
         </div>
 
@@ -43,12 +60,17 @@
           class="btn btn-primary btn-block"
           :disabled="loading"
         >
-          <span v-if="loading" class="spinner-border spinner-border-sm mr-2"></span>
+          <span
+            v-if="loading"
+            class="spinner-border spinner-border-sm mr-2"
+          />
           {{ loading ? 'Connexion en cours...' : 'Se connecter' }}
         </button>
         
         <div class="admin-setup-link">
-          <router-link to="/admin/setup">Configurer un administrateur initial</router-link>
+          <router-link to="/admin/setup">
+            Configurer un administrateur initial
+          </router-link>
         </div>
       </form>
     </div>
