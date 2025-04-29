@@ -241,14 +241,17 @@ export class DepartmentsService {
     try {
       const department = await this.findOne(id);
       
-      // si le département a des équipements ou des équipes
-      if ((department.equipment && department.equipment.length > 0) || 
-          (department.teams && department.teams.length > 0)) {
-        throw new ConflictException(`Impossible de supprimer le département car il contient des équipements ou des équipes`);
+      // Vérifier si le département existe
+      if (!department) {
+        throw new NotFoundException(`Département avec ID "${id}" non trouvé`);
       }
       
-      await this.departmentsRepository.remove(department);
-      this.logger.log(`Département supprimé: ${department.name}`);
+      // Supprimer le département, même s'il contient des équipements ou des équipes
+      // La suppression sera propagée aux relations grâce aux contraintes de clé étrangère
+      // configurées avec cascade dans les entités
+      await this.departmentsRepository.delete(id);
+      
+      this.logger.log(`Département supprimé avec succès: ${department.name}`);
     } catch (error) {
       this.logger.error(`Erreur lors de la suppression du département ${id}: ${error.message}`, error.stack);
       throw error;

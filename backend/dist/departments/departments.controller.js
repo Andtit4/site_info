@@ -130,11 +130,12 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], DepartmentsController.prototype, "update", null);
 __decorate([
-    (0, swagger_1.ApiOperation)({ summary: 'Supprimer un département', description: 'Supprime un département de la base de données' }),
+    (0, swagger_1.ApiOperation)({ summary: 'Supprimer un département', description: 'Supprime un département de la base de données. Cette action est réservée aux administrateurs. Les équipements associés seront supprimés et les utilisateurs liés au département seront conservés mais leur lien au département sera effacé.' }),
     (0, swagger_1.ApiParam)({ name: 'id', description: 'Identifiant du département' }),
     (0, swagger_1.ApiResponse)({ status: 200, description: 'Département supprimé avec succès' }),
     (0, swagger_1.ApiResponse)({ status: 404, description: 'Département non trouvé' }),
     (0, swagger_1.ApiResponse)({ status: 401, description: 'Non autorisé' }),
+    (0, swagger_1.ApiResponse)({ status: 403, description: 'Accès refusé - réservé aux administrateurs' }),
     (0, common_1.Delete)(':id'),
     (0, common_1.UseGuards)(admin_guard_1.AdminGuard),
     __param(0, (0, common_1.Param)('id')),

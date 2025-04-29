@@ -83,7 +83,7 @@ export class Equipment {
   @Column()
   siteId: string;
   
-  @ManyToOne(() => Department, department => department.equipment, { nullable: true })
+  @ManyToOne(() => Department, department => department.equipment, { nullable: true, onDelete: 'CASCADE' })
   @JoinColumn({ name: 'departmentId' })
   department: Department;
 

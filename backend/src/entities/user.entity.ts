@@ -41,7 +41,7 @@ export class User {
   @Column({ nullable: true })
   lastLogin: Date;
 
-  @ManyToOne(() => Department, { nullable: true })
+  @ManyToOne(() => Department, { nullable: true, onDelete: 'SET NULL' })
   @JoinColumn({ name: 'departmentId' })
   department: Department;
 

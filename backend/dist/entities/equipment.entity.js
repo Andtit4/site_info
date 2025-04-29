@@ -110,7 +110,7 @@ __decorate([
     __metadata("design:type", String)
 ], Equipment.prototype, "siteId", void 0);
 __decorate([
-    (0, typeorm_1.ManyToOne)(() => department_entity_1.Department, department => department.equipment, { nullable: true }),
+    (0, typeorm_1.ManyToOne)(() => department_entity_1.Department, department => department.equipment, { nullable: true, onDelete: 'CASCADE' }),
     (0, typeorm_1.JoinColumn)({ name: 'departmentId' }),
     __metadata("design:type", department_entity_1.Department)
 ], Equipment.prototype, "department", void 0);

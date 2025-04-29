@@ -86,11 +86,12 @@ export class DepartmentsController {
     return this.departmentsService.update(id, updateDepartmentDto);
   }
 
-  @ApiOperation({ summary: 'Supprimer un département', description: 'Supprime un département de la base de données' })
+  @ApiOperation({ summary: 'Supprimer un département', description: 'Supprime un département de la base de données. Cette action est réservée aux administrateurs. Les équipements associés seront supprimés et les utilisateurs liés au département seront conservés mais leur lien au département sera effacé.' })
   @ApiParam({ name: 'id', description: 'Identifiant du département' })
   @ApiResponse({ status: 200, description: 'Département supprimé avec succès' })
   @ApiResponse({ status: 404, description: 'Département non trouvé' })
   @ApiResponse({ status: 401, description: 'Non autorisé' })
+  @ApiResponse({ status: 403, description: 'Accès refusé - réservé aux administrateurs' })
   @Delete(':id')
   @UseGuards(AdminGuard)
   remove(@Param('id') id: string): Promise<void> {

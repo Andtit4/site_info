@@ -190,12 +190,11 @@ let DepartmentsService = DepartmentsService_1 = class DepartmentsService {
     async remove(id) {
         try {
             const department = await this.findOne(id);
-            if ((department.equipment && department.equipment.length > 0) ||
-                (department.teams && department.teams.length > 0)) {
-                throw new common_1.ConflictException(`Impossible de supprimer le département car il contient des équipements ou des équipes`);
+            if (!department) {
+                throw new common_1.NotFoundException(`Département avec ID "${id}" non trouvé`);
             }
-            await this.departmentsRepository.remove(department);
-            this.logger.log(`Département supprimé: ${department.name}`);
+            await this.departmentsRepository.delete(id);
+            this.logger.log(`Département supprimé avec succès: ${department.name}`);
         }
         catch (error) {
             this.logger.error(`Erreur lors de la suppression du département ${id}: ${error.message}`, error.stack);
