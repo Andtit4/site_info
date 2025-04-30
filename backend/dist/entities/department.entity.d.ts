@@ -22,4 +22,5 @@ export declare class Department {
     managedEquipmentTypes: string[];
     createdAt: Date;
     updatedAt: Date;
+    isDeleted: boolean;
 }

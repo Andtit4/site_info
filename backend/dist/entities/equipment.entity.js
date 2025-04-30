@@ -99,6 +99,10 @@ __decorate([
     __metadata("design:type", String)
 ], Equipment.prototype, "macAddress", void 0);
 __decorate([
+    (0, typeorm_1.Column)({ name: 'isDeleted', type: 'boolean', default: false }),
+    __metadata("design:type", Boolean)
+], Equipment.prototype, "isDeleted", void 0);
+__decorate([
     (0, typeorm_1.ManyToOne)(() => site_entity_1.Site, site => site.equipment, {
         onDelete: 'CASCADE',
     }),

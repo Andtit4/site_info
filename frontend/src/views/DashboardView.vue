@@ -159,26 +159,27 @@ export default {
     const loadStats = async () => {
       try {
         const [sitesStats, equipmentStats, departmentsStats] = await Promise.all([
-          sitesApi.getStatistics(),
-          equipmentApi.getStatistics(),
-          departmentsApi.getStatistics(),
+          sitesApi.getStatistics().catch(e => { console.error('Erreur lors du chargement des statistiques des sites:', e); return { totalSites: 0 }; }),
+          equipmentApi.getStatistics().catch(e => { console.error('Erreur lors du chargement des statistiques des équipements:', e); return { totalEquipment: 0 }; }),
+          departmentsApi.getStatistics().catch(e => { console.error('Erreur lors du chargement des statistiques des départements:', e); return { total: 0, totalTeams: 0 }; }),
         ]);
 
-        stats.value[0].value = sitesStats.totalSites;
-        stats.value[1].value = equipmentStats.totalEquipment;
-        stats.value[2].value = departmentsStats.totalDepartments;
-        stats.value[3].value = departmentsStats.totalTeams;
+        // Mettre à jour les statistiques générales avec des valeurs par défaut en cas de données manquantes
+        stats.value[0].value = sitesStats?.totalSites || 0;
+        stats.value[1].value = equipmentStats?.totalEquipment || 0;
+        stats.value[2].value = departmentsStats?.total || 0;
+        stats.value[3].value = departmentsStats?.totalTeams || 0;
         
-        // Départements par type
-        departmentsByType.value = departmentsStats.departmentsByType;
+        // Départements par type (avec vérification)
+        departmentsByType.value = departmentsStats?.departmentsByType || [];
         
-        // Équipements par département
-        equipmentsByDepartment.value = departmentsStats.equipmentCountByDepartment;
+        // Équipements par département (avec vérification)
+        equipmentsByDepartment.value = departmentsStats?.equipmentCountByDepartment || [];
         
         // Calculer le nombre maximum d'équipements pour la barre de progression
-        if (equipmentsByDepartment.value.length > 0) {
+        if (equipmentsByDepartment.value && equipmentsByDepartment.value.length > 0) {
           maxEquipmentCount.value = Math.max(
-            ...equipmentsByDepartment.value.map(dept => parseInt(dept.equipmentCount))
+            ...equipmentsByDepartment.value.map(dept => parseInt(dept.equipmentCount) || 0)
           );
         }
       } catch (error) {
@@ -214,6 +215,18 @@ export default {
         const equipmentStats = await equipmentApi.getStatistics();
         const sitesStats = await sitesApi.getStatistics();
 
+        // Vérifier que les éléments canvas existent avant de créer les graphiques
+        if (!equipmentChart.value || !sitesChart.value) {
+          console.warn('Les éléments canvas ne sont pas disponibles');
+          return;
+        }
+
+        // Vérifier que les données sont disponibles
+        if (!equipmentStats?.byType || Object.keys(equipmentStats.byType).length === 0) {
+          console.warn('Aucune donnée disponible pour le graphique des équipements');
+          return;
+        }
+
         // Graphique des équipements par type
         new Chart(equipmentChart.value, {
           type: 'doughnut',
@@ -243,6 +256,12 @@ export default {
             },
           },
         });
+
+        // Vérifier que les données pour les sites sont disponibles
+        if (!sitesStats?.byDepartment || Object.keys(sitesStats.byDepartment).length === 0) {
+          console.warn('Aucune donnée disponible pour le graphique des sites');
+          return;
+        }
 
         // Graphique des sites par département
         new Chart(sitesChart.value, {

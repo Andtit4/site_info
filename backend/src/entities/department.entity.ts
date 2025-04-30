@@ -63,4 +63,7 @@ export class Department {
 
   @Column({ default: () => 'CURRENT_TIMESTAMP', onUpdate: 'CURRENT_TIMESTAMP' })
   updatedAt: Date;
+
+  @Column({ default: false })
+  isDeleted: boolean;
 } 

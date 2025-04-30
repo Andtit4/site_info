@@ -367,9 +367,11 @@
               </div>
               
               <p class="text-sm text-gray-500 dark:text-gray-400">
-                Si vous activez cette option, un compte sera créé pour le département lui permettant de se connecter à l'application.
+                Si vous activez cette option, un compte utilisateur sera créé pour le département lui permettant de se connecter à l'application.
                 <br>
-                Le nom d'utilisateur sera généré automatiquement à partir du nom du département et les identifiants seront envoyés à l'adresse email indiquée.
+                Le nom d'utilisateur sera généré automatiquement à partir du nom du département et les identifiants seront envoyés par email à l'adresse indiquée.
+                <br>
+                L'utilisateur aura les mêmes droits et rôles que le département.
               </p>
               
               <div v-if="form.createAccount">
@@ -621,6 +623,7 @@ export default {
             password: form.value.password
           };
           await departmentsApi.update(currentDepartment.value.id, cleanedData);
+          toast.success(`Le département ${form.value.name} a été mis à jour avec succès`);
         } else {
           // S'assurer que contactPhone est bien un nombre pour la création
           const data = { ...form.value };
@@ -628,11 +631,19 @@ export default {
             data.contactPhone = Number(data.contactPhone);
           }
           await departmentsApi.create(data);
+          
+          // Afficher un message de confirmation spécifique si un compte utilisateur a été créé
+          if (form.value.createAccount) {
+            toast.success(`Le département ${form.value.name} a été créé avec succès. Un email avec les identifiants de connexion a été envoyé à ${form.value.contactEmail}`);
+          } else {
+            toast.success(`Le département ${form.value.name} a été créé avec succès`);
+          }
         }
         await loadData();
         closeModal();
       } catch (error) {
         console.error('Erreur lors de la sauvegarde:', error);
+        toast.error(`Erreur: ${error.response?.data?.message || error.message || 'Problème lors de la sauvegarde'}`);
       }
     };
 

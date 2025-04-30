@@ -56,13 +56,17 @@ let EmailService = EmailService_1 = class EmailService {
                 await this.initializeTransporter();
             }
             const subject = 'Vos identifiants de connexion - Site Info';
+            let userType = 'utilisateur';
+            if (isDepartment) {
+                userType = 'département avec droits d\'administration';
+            }
             const html = `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
           <h2 style="color: #3f51b5;">Site Info - Identifiants de connexion</h2>
           
           <p>Bonjour ${firstName} ${lastName},</p>
           
-          <p>Voici vos identifiants de connexion pour accéder à l'application Site Info en tant que <strong>${isDepartment ? 'département' : 'utilisateur'}</strong> :</p>
+          <p>Voici vos identifiants de connexion pour accéder à l'application Site Info en tant que <strong>${userType}</strong> :</p>
           
           <div style="background-color: #f5f5f5; padding: 15px; border-radius: 5px; margin: 20px 0;">
             <p><strong>Nom d'utilisateur:</strong> ${username}</p>
@@ -85,7 +89,7 @@ let EmailService = EmailService_1 = class EmailService {
         
         Bonjour ${firstName} ${lastName},
         
-        Voici vos identifiants de connexion pour accéder à l'application Site Info en tant que ${isDepartment ? 'département' : 'utilisateur'} :
+        Voici vos identifiants de connexion pour accéder à l'application Site Info en tant que ${userType} :
         
         Nom d'utilisateur: ${username}
         Mot de passe: ${password}
@@ -153,6 +157,72 @@ let EmailService = EmailService_1 = class EmailService {
         Nom d'utilisateur: ${username}
         
         Si vous n'êtes pas à l'origine de cette modification, veuillez contacter immédiatement l'administrateur du système.
+        
+        Cordialement,
+        L'équipe Site Info
+      `;
+            const config = (0, email_config_1.emailConfig)(this.configService);
+            const info = await this.transporter.sendMail({
+                from: `"Site Info" <${config.from}>`,
+                to,
+                subject,
+                text,
+                html,
+            });
+            this.logger.log(`Email envoyé: ${info.messageId}`);
+            if (info.messageId && info.envelope && info.ethereal) {
+                this.logger.log(`URL de prévisualisation: ${nodemailer.getTestMessageUrl(info)}`);
+            }
+            return true;
+        }
+        catch (error) {
+            this.logger.error(`Erreur lors de l'envoi de l'email: ${error.message}`, error.stack);
+            return false;
+        }
+    }
+    async sendWelcomeEmail(to, username, password, firstName, lastName) {
+        try {
+            if (!this.transporter) {
+                await this.initializeTransporter();
+            }
+            const subject = 'Bienvenue sur Site Info - Vos identifiants de connexion';
+            const html = `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+          <h2 style="color: #3f51b5;">Bienvenue sur Site Info</h2>
+          
+          <p>Bonjour ${firstName || ''} ${lastName || ''},</p>
+          
+          <p>Votre compte a été créé sur l'application Site Info. Voici vos identifiants de connexion :</p>
+          
+          <div style="background-color: #f5f5f5; padding: 15px; border-radius: 5px; margin: 20px 0;">
+            <p><strong>Nom d'utilisateur:</strong> ${username}</p>
+            <p><strong>Mot de passe:</strong> ${password}</p>
+          </div>
+          
+          <p>Pour des raisons de sécurité, veuillez changer votre mot de passe lors de votre première connexion.</p>
+          
+          <p>Pour vous connecter, veuillez accéder à l'application Site Info et utiliser ces identifiants sur la page de connexion.</p>
+          
+          <p style="margin-top: 30px; padding-top: 10px; border-top: 1px solid #eee; font-size: 12px; color: #777;">
+            Cet email a été envoyé automatiquement, merci de ne pas y répondre.<br>
+            Cordialement,<br>
+            L'équipe Site Info
+          </p>
+        </div>
+      `;
+            const text = `
+        Bienvenue sur Site Info
+        
+        Bonjour ${firstName || ''} ${lastName || ''},
+        
+        Votre compte a été créé sur l'application Site Info. Voici vos identifiants de connexion :
+        
+        Nom d'utilisateur: ${username}
+        Mot de passe: ${password}
+        
+        Pour des raisons de sécurité, veuillez changer votre mot de passe lors de votre première connexion.
+        
+        Pour vous connecter, veuillez accéder à l'application Site Info et utiliser ces identifiants sur la page de connexion.
         
         Cordialement,
         L'équipe Site Info

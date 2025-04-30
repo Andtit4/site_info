@@ -135,13 +135,20 @@ export default {
         name: 'Départements',
         path: '/dashboard/departments',
         icon: 'BuildingLibraryIcon',
-        requiredRole: 'admin'
+        requiredRole: 'admin',
+        hideForDepartmentUser: true
       },
       {
         name: 'Équipes',
         path: '/dashboard/teams',
         icon: 'UserGroupIcon',
         requiredRole: 'any'
+      },
+      {
+        name: 'Utilisateurs',
+        path: '/dashboard/users',
+        icon: 'UserGroupIcon',
+        requiredRole: 'admin'
       },
       {
         name: 'Spécifications',
@@ -160,10 +167,26 @@ export default {
       return authService.isAdmin();
     });
 
+    const isDepartmentUser = computed(() => {
+      return authService.isDepartmentUser();
+    });
+
     const filteredNavigationItems = computed(() => {
       const isAdminUser = isAdmin.value;
+      const isDepartmentUserValue = isDepartmentUser.value;
+      
       return navigationItems.filter(item => {
-        return item.requiredRole === 'any' || (item.requiredRole === 'admin' && isAdminUser);
+        // Si l'élément nécessite d'être admin et l'utilisateur n'est pas admin
+        if (item.requiredRole === 'admin' && !isAdminUser) {
+          return false;
+        }
+        
+        // Si l'élément doit être caché pour les utilisateurs département et c'est un utilisateur département
+        if (item.hideForDepartmentUser && isDepartmentUserValue) {
+          return false;
+        }
+        
+        return true;
       });
     });
 

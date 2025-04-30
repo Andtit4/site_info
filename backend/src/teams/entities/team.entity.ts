@@ -3,6 +3,7 @@ import { Department } from '../../entities/department.entity';
 import { Site } from '../../entities/site.entity';
 import { Equipment } from '../../entities/equipment.entity';
 import { EquipmentType } from '../../entities/equipment.entity';
+import { User } from '../../entities/user.entity';
 
 export enum TeamStatus {
   ACTIVE = 'ACTIVE',
@@ -65,6 +66,9 @@ export class Team {
   @Column()
   departmentId: string;
 
+  @OneToMany(() => User, user => user.team)
+  users: User[];
+
   @ManyToMany(() => Site, site => site.teams)
   @JoinTable({
     name: 'team_sites',
@@ -92,4 +96,7 @@ export class Team {
     },
   })
   equipment: Equipment[];
+
+  @Column({ default: false })
+  isDeleted: boolean;
 } 

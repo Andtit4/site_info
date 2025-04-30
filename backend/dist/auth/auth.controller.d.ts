@@ -7,19 +7,7 @@ export declare class AuthController {
     private readonly authService;
     private readonly usersService;
     constructor(authService: AuthService, usersService: UsersService);
-    login(loginDto: LoginDto): Promise<{
-        access_token: string;
-        user: {
-            id: any;
-            username: any;
-            firstName: any;
-            lastName: any;
-            email: any;
-            isAdmin: any;
-            isDepartmentAdmin: any;
-            departmentId: any;
-        };
-    }>;
+    login(loginDto: LoginDto): Promise<any>;
     getProfile(req: any): Promise<any>;
     createAdmin(createAdminDto: CreateAdminDto): Promise<{
         id: string;

@@ -25,7 +25,7 @@ export class AuthController {
   @Post('login')
   @HttpCode(HttpStatus.OK)
   async login(@Body() loginDto: LoginDto) {
-    return this.authService.login(loginDto);
+    return this.authService.login(loginDto.username, loginDto.password);
   }
 
   @ApiOperation({ summary: 'Profil utilisateur', description: 'Récupère les informations de l\'utilisateur connecté' })

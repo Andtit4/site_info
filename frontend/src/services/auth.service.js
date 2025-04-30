@@ -34,12 +34,13 @@ export default {
     async login(credentials) {
         try {
             const response = await axios.post(`${API_URL}/auth/login`, credentials)
-            const { access_token, user } = response.data
+            const userData = response.data
+            const token = userData.accessToken
 
-            localStorage.setItem('token', access_token)
-            localStorage.setItem('user', JSON.stringify(user))
+            localStorage.setItem('token', token)
+            localStorage.setItem('user', JSON.stringify(userData))
 
-            return { user, token: access_token }
+            return { user: userData, token }
         } catch (error) {
             console.error('Erreur lors de la connexion:', error)
             throw new Error( /* error.response ? .data ? .message || */ 'Erreur lors de la connexion')
@@ -77,6 +78,37 @@ export default {
     isDepartmentUser() {
         const user = this.getCurrentUser()
         return user && user.departmentId && !user.isAdmin
+    },
+
+    isDepartmentAdmin() {
+        const user = this.getCurrentUser()
+        return user && user.isDepartmentAdmin
+    },
+
+    isTeamMember() {
+        const user = this.getCurrentUser()
+        return user && user.isTeamMember
+    },
+
+    hasDepartmentRights() {
+        const user = this.getCurrentUser()
+        return user && user.hasDepartmentRights
+    },
+
+    canManageEquipmentType(equipmentType) {
+        const user = this.getCurrentUser()
+
+        // Les admins peuvent tout gérer
+        if (user && user.isAdmin) {
+            return true
+        }
+
+        // Vérifier si l'utilisateur a des types d'équipement spécifiques qu'il peut gérer
+        if (user && user.managedEquipmentTypes && Array.isArray(user.managedEquipmentTypes)) {
+            return user.managedEquipmentTypes.includes(equipmentType)
+        }
+
+        return false
     },
 
     getToken() {

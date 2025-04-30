@@ -151,6 +151,67 @@
               </div>
             </div>
 
+            <!-- Section de permissions et rôles -->
+            <div class="border-t border-gray-200 dark:border-gray-700 px-4 py-5 sm:p-6">
+              <h3 class="text-md font-medium text-gray-900 dark:text-white mb-4">Permissions et rôles</h3>
+              
+              <div class="grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-2">
+                <!-- Statut Administrateur -->
+                <div v-if="user?.isAdmin" class="flex items-center">
+                  <span class="inline-flex items-center px-3 py-0.5 rounded-full text-sm font-medium bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200">
+                    <svg class="mr-1.5 h-2 w-2 text-green-600 dark:text-green-400" fill="currentColor" viewBox="0 0 8 8">
+                      <circle cx="4" cy="4" r="3" />
+                    </svg>
+                    Administrateur
+                  </span>
+                </div>
+
+                <!-- Statut Administrateur Département -->
+                <div v-if="user?.isDepartmentAdmin" class="flex items-center">
+                  <span class="inline-flex items-center px-3 py-0.5 rounded-full text-sm font-medium bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200">
+                    <svg class="mr-1.5 h-2 w-2 text-blue-600 dark:text-blue-400" fill="currentColor" viewBox="0 0 8 8">
+                      <circle cx="4" cy="4" r="3" />
+                    </svg>
+                    Administrateur de département
+                  </span>
+                </div>
+
+                <!-- Statut Membre d'équipe -->
+                <div v-if="user?.isTeamMember" class="flex items-center">
+                  <span class="inline-flex items-center px-3 py-0.5 rounded-full text-sm font-medium bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200">
+                    <svg class="mr-1.5 h-2 w-2 text-purple-600 dark:text-purple-400" fill="currentColor" viewBox="0 0 8 8">
+                      <circle cx="4" cy="4" r="3" />
+                    </svg>
+                    Membre d'équipe
+                  </span>
+                </div>
+
+                <!-- Hérite des droits département -->
+                <div v-if="user?.hasDepartmentRights" class="flex items-center">
+                  <span class="inline-flex items-center px-3 py-0.5 rounded-full text-sm font-medium bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200">
+                    <svg class="mr-1.5 h-2 w-2 text-yellow-600 dark:text-yellow-400" fill="currentColor" viewBox="0 0 8 8">
+                      <circle cx="4" cy="4" r="3" />
+                    </svg>
+                    Droits hérités du département
+                  </span>
+                </div>
+              </div>
+
+              <!-- Types d'équipement gérés -->
+              <div class="mt-6" v-if="user?.managedEquipmentTypes && user.managedEquipmentTypes.length > 0">
+                <h4 class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Types d'équipement gérés:</h4>
+                <div class="flex flex-wrap gap-2">
+                  <span 
+                    v-for="(type, index) in user.managedEquipmentTypes" 
+                    :key="index" 
+                    class="inline-flex items-center px-2.5 py-0.5 rounded-md text-sm font-medium bg-indigo-100 text-indigo-800 dark:bg-indigo-900 dark:text-indigo-200"
+                  >
+                    {{ type }}
+                  </span>
+                </div>
+              </div>
+            </div>
+
             <div class="pt-5 flex justify-end">
               <button
                 type="button"

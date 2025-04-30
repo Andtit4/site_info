@@ -25,33 +25,52 @@ export class AuthService {
     return null;
   }
 
-  async login(loginDto: LoginDto) {
-    const user = await this.validateUser(loginDto.username, loginDto.password);
+  /**
+   * Authentifie un utilisateur et retourne un token JWT
+   * @param username Nom d'utilisateur
+   * @param password Mot de passe
+   * @returns Données d'authentification avec le token JWT
+   */
+  async login(username: string, password: string): Promise<any> {
+    const user = await this.validateUser(username, password);
     
     if (!user) {
-      throw new UnauthorizedException('Identifiants invalides');
+      throw new UnauthorizedException('Identifiants incorrects');
     }
-
+    
+    // Mettre à jour la date de dernière connexion
+    user.lastLogin = new Date();
+    await this.usersRepository.save(user);
+    
+    // Récupérer les permissions et droits de l'utilisateur
+    const permissions = await this.usersService.getUserPermissions(user.id);
+    
+    // Créer le payload du token
     const payload = { 
-      username: user.username, 
       sub: user.id, 
+      username: user.username,
       isAdmin: user.isAdmin,
       isDepartmentAdmin: user.isDepartmentAdmin,
-      departmentId: user.departmentId
+      isTeamMember: user.isTeamMember,
+      departmentId: user.departmentId,
+      teamId: user.teamId,
+      hasDepartmentRights: user.hasDepartmentRights
     };
     
     return {
-      access_token: this.jwtService.sign(payload),
-      user: {
-        id: user.id,
-        username: user.username,
-        firstName: user.firstName,
-        lastName: user.lastName,
-        email: user.email,
-        isAdmin: user.isAdmin,
-        isDepartmentAdmin: user.isDepartmentAdmin,
-        departmentId: user.departmentId
-      }
+      id: user.id,
+      username: user.username,
+      email: user.email,
+      firstName: user.firstName,
+      lastName: user.lastName,
+      isAdmin: user.isAdmin,
+      isDepartmentAdmin: user.isDepartmentAdmin,
+      isTeamMember: user.isTeamMember,
+      departmentId: user.departmentId,
+      teamId: user.teamId,
+      hasDepartmentRights: user.hasDepartmentRights,
+      managedEquipmentTypes: permissions.managedEquipmentTypes,
+      accessToken: this.jwtService.sign(payload),
     };
   }
 

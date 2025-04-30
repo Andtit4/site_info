@@ -11,7 +11,12 @@ export declare class CreateTeamDto {
     lastActiveDate?: string;
     metadata?: Record<string, any>;
     equipmentType?: EquipmentType;
+    equipmentTypes?: EquipmentType[];
     departmentId?: string;
+    createAccount?: boolean;
+    password?: string;
+    userEmail?: string;
+    hasDepartmentRights?: boolean;
 }
 export declare class UpdateTeamDto {
     name?: string;
@@ -24,6 +29,7 @@ export declare class UpdateTeamDto {
     lastActiveDate?: string;
     metadata?: Record<string, any>;
     equipmentType?: EquipmentType;
+    equipmentTypes?: EquipmentType[];
     departmentId?: string;
 }
 export declare class TeamFilterDto {

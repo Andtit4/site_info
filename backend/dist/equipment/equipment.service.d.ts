@@ -15,6 +15,8 @@ export declare class EquipmentService {
     create(createEquipmentDto: CreateEquipmentDto): Promise<Equipment>;
     update(id: string, updateEquipmentDto: UpdateEquipmentDto): Promise<Equipment>;
     remove(id: string): Promise<void>;
+    removeBySiteId(siteId: string): Promise<number>;
+    removeByDepartmentId(departmentId: string): Promise<number>;
     getStatistics(): Promise<{
         totalEquipment: number;
         byType: {};

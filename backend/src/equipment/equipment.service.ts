@@ -22,7 +22,8 @@ export class EquipmentService {
     const { search, type, status, siteId, departmentId } = filterDto;
     const query = this.equipmentRepository.createQueryBuilder('equipment')
       .leftJoinAndSelect('equipment.site', 'site')
-      .leftJoinAndSelect('equipment.department', 'department');
+      .leftJoinAndSelect('equipment.department', 'department')
+      .where('equipment.isDeleted = :isDeleted', { isDeleted: false });
 
     if (search) {
       query.andWhere(
@@ -51,7 +52,9 @@ export class EquipmentService {
   }
 
   async findOne(id: string): Promise<Equipment> {
-    const equipment = await this.equipmentRepository.findOne({ where: { id } });
+    const equipment = await this.equipmentRepository.findOne({ 
+      where: { id, isDeleted: false } 
+    });
     
     if (!equipment) {
       throw new NotFoundException(`equipement avec ID ${id} non trouve`);
@@ -76,7 +79,7 @@ export class EquipmentService {
 
     // Verifier si un equipement avec cet ID existe dejà
     const existingEquipment = await this.equipmentRepository.findOne({
-      where: { id: createEquipmentDto.id },
+      where: { id: createEquipmentDto.id, isDeleted: false },
     });
 
     if (existingEquipment) {
@@ -117,23 +120,52 @@ export class EquipmentService {
   }
 
   async remove(id: string): Promise<void> {
-    const result = await this.equipmentRepository.delete(id);
+    // Marquer comme supprimé au lieu de supprimer physiquement
+    const equipment = await this.findOne(id);
+    equipment.isDeleted = true;
+    await this.equipmentRepository.save(equipment);
+  }
+
+  // Méthode pour supprimer tous les équipements d'un site
+  async removeBySiteId(siteId: string): Promise<number> {
+    // Marquer tous les équipements du site comme supprimés
+    const result = await this.equipmentRepository
+      .createQueryBuilder()
+      .update(Equipment)
+      .set({ isDeleted: true })
+      .where("siteId = :siteId", { siteId })
+      .andWhere("isDeleted = :isDeleted", { isDeleted: false })
+      .execute();
     
-    if (result.affected === 0) {
-      throw new NotFoundException(`equipement avec ID ${id} non trouve`);
-    }
+    return result.affected || 0;
+  }
+
+  // Méthode pour supprimer tous les équipements d'un département
+  async removeByDepartmentId(departmentId: string): Promise<number> {
+    // Marquer tous les équipements du département comme supprimés
+    const result = await this.equipmentRepository
+      .createQueryBuilder()
+      .update(Equipment)
+      .set({ isDeleted: true })
+      .where("departmentId = :departmentId", { departmentId })
+      .andWhere("isDeleted = :isDeleted", { isDeleted: false })
+      .execute();
+    
+    return result.affected || 0;
   }
 
   // utilitaire pour obtenir des statistiques des equipements
   async getStatistics() {
-    // Nombre total d'equipements
-    const totalEquipment = await this.equipmentRepository.count();
+    // Nombre total d'equipements non supprimés
+    const totalEquipment = await this.equipmentRepository.count({
+      where: { isDeleted: false }
+    });
     
     // equipements par type
     const typeCounts = {};
     for (const type in EquipmentType) {
       const count = await this.equipmentRepository.count({
-        where: { name: EquipmentType[type] }, // Utiliser name au lieu de type
+        where: { name: EquipmentType[type], isDeleted: false },
       });
       typeCounts[EquipmentType[type]] = count;
     }
@@ -142,7 +174,7 @@ export class EquipmentService {
     const statusCounts = {};
     for (const status in EquipmentStatus) {
       const count = await this.equipmentRepository.count({
-        where: { status: EquipmentStatus[status] },
+        where: { status: EquipmentStatus[status], isDeleted: false },
       });
       statusCounts[EquipmentStatus[status]] = count;
     }
@@ -161,7 +193,7 @@ export class EquipmentService {
     }
 
     return this.equipmentRepository.find({
-      where: { name: EquipmentType[type] }, // Utiliser name au lieu de type
+      where: { name: EquipmentType[type], isDeleted: false },
       relations: ['site', 'department'],
     });
   }

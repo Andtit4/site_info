@@ -29,7 +29,7 @@ let AuthController = class AuthController {
         this.usersService = usersService;
     }
     async login(loginDto) {
-        return this.authService.login(loginDto);
+        return this.authService.login(loginDto.username, loginDto.password);
     }
     async getProfile(req) {
         return req.user;

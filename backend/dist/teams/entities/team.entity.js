@@ -14,6 +14,7 @@ const typeorm_1 = require("typeorm");
 const department_entity_1 = require("../../entities/department.entity");
 const site_entity_1 = require("../../entities/site.entity");
 const equipment_entity_1 = require("../../entities/equipment.entity");
+const user_entity_1 = require("../../entities/user.entity");
 var TeamStatus;
 (function (TeamStatus) {
     TeamStatus["ACTIVE"] = "ACTIVE";
@@ -91,6 +92,10 @@ __decorate([
     __metadata("design:type", String)
 ], Team.prototype, "departmentId", void 0);
 __decorate([
+    (0, typeorm_1.OneToMany)(() => user_entity_1.User, user => user.team),
+    __metadata("design:type", Array)
+], Team.prototype, "users", void 0);
+__decorate([
     (0, typeorm_1.ManyToMany)(() => site_entity_1.Site, site => site.teams),
     (0, typeorm_1.JoinTable)({
         name: 'team_sites',
@@ -120,6 +125,10 @@ __decorate([
     }),
     __metadata("design:type", Array)
 ], Team.prototype, "equipment", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ default: false }),
+    __metadata("design:type", Boolean)
+], Team.prototype, "isDeleted", void 0);
 exports.Team = Team = __decorate([
     (0, typeorm_1.Entity)()
 ], Team);

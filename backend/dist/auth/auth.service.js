@@ -34,30 +34,38 @@ let AuthService = class AuthService {
         }
         return null;
     }
-    async login(loginDto) {
-        const user = await this.validateUser(loginDto.username, loginDto.password);
+    async login(username, password) {
+        const user = await this.validateUser(username, password);
         if (!user) {
-            throw new common_1.UnauthorizedException('Identifiants invalides');
+            throw new common_1.UnauthorizedException('Identifiants incorrects');
         }
+        user.lastLogin = new Date();
+        await this.usersRepository.save(user);
+        const permissions = await this.usersService.getUserPermissions(user.id);
         const payload = {
-            username: user.username,
             sub: user.id,
+            username: user.username,
             isAdmin: user.isAdmin,
             isDepartmentAdmin: user.isDepartmentAdmin,
-            departmentId: user.departmentId
+            isTeamMember: user.isTeamMember,
+            departmentId: user.departmentId,
+            teamId: user.teamId,
+            hasDepartmentRights: user.hasDepartmentRights
         };
         return {
-            access_token: this.jwtService.sign(payload),
-            user: {
-                id: user.id,
-                username: user.username,
-                firstName: user.firstName,
-                lastName: user.lastName,
-                email: user.email,
-                isAdmin: user.isAdmin,
-                isDepartmentAdmin: user.isDepartmentAdmin,
-                departmentId: user.departmentId
-            }
+            id: user.id,
+            username: user.username,
+            email: user.email,
+            firstName: user.firstName,
+            lastName: user.lastName,
+            isAdmin: user.isAdmin,
+            isDepartmentAdmin: user.isDepartmentAdmin,
+            isTeamMember: user.isTeamMember,
+            departmentId: user.departmentId,
+            teamId: user.teamId,
+            hasDepartmentRights: user.hasDepartmentRights,
+            managedEquipmentTypes: permissions.managedEquipmentTypes,
+            accessToken: this.jwtService.sign(payload),
         };
     }
     async countAdmins() {

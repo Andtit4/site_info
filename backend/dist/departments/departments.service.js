@@ -89,7 +89,8 @@ let DepartmentsService = DepartmentsService_1 = class DepartmentsService {
     async findAll(filterDto = {}) {
         try {
             const { type, isActive, search, managesEquipmentType } = filterDto;
-            const query = this.departmentsRepository.createQueryBuilder('department');
+            const query = this.departmentsRepository.createQueryBuilder('department')
+                .where('department.isDeleted = :isDeleted', { isDeleted: false });
             if (type) {
                 query.andWhere('department.type = :type', { type });
             }
@@ -116,8 +117,8 @@ let DepartmentsService = DepartmentsService_1 = class DepartmentsService {
                 'department.createdAt',
                 'department.updatedAt'
             ])
-                .leftJoinAndSelect('department.equipment', 'equipment')
-                .leftJoinAndSelect('department.teams', 'teams');
+                .leftJoinAndSelect('department.equipment', 'equipment', 'equipment.isDeleted = :equipDeleted', { equipDeleted: false })
+                .leftJoinAndSelect('department.teams', 'teams', 'teams.isDeleted = :teamsDeleted', { teamsDeleted: false });
             const departments = await query.getMany();
             departments.forEach(department => {
                 if (department.managedEquipmentTypes && typeof department.managedEquipmentTypes === 'string') {
@@ -137,10 +138,12 @@ let DepartmentsService = DepartmentsService_1 = class DepartmentsService {
     }
     async findOne(id) {
         try {
-            const department = await this.departmentsRepository.findOne({
-                where: { id },
-                relations: ['equipment', 'teams'],
-            });
+            const departmentQuery = this.departmentsRepository.createQueryBuilder('department')
+                .where('department.id = :id', { id })
+                .andWhere('department.isDeleted = :isDeleted', { isDeleted: false })
+                .leftJoinAndSelect('department.equipment', 'equipment', 'equipment.isDeleted = :equipDeleted', { equipDeleted: false })
+                .leftJoinAndSelect('department.teams', 'teams', 'teams.isDeleted = :teamsDeleted', { teamsDeleted: false });
+            const department = await departmentQuery.getOne();
             if (!department) {
                 throw new common_1.NotFoundException(`Département avec ID "${id}" non trouvé`);
             }
@@ -193,8 +196,10 @@ let DepartmentsService = DepartmentsService_1 = class DepartmentsService {
             if (!department) {
                 throw new common_1.NotFoundException(`Département avec ID "${id}" non trouvé`);
             }
-            await this.departmentsRepository.delete(id);
-            this.logger.log(`Département supprimé avec succès: ${department.name}`);
+            await this.usersService.deleteDepartmentUsers(id);
+            department.isDeleted = true;
+            await this.departmentsRepository.save(department);
+            this.logger.log(`Département supprimé: ${department.name}`);
         }
         catch (error) {
             this.logger.error(`Erreur lors de la suppression du département ${id}: ${error.message}`, error.stack);

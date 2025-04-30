@@ -33,6 +33,7 @@ export declare class Equipment {
     warrantyExpiration: Date;
     ipAddress: string;
     macAddress: string;
+    isDeleted: boolean;
     site: Site;
     siteId: string;
     department: Department;

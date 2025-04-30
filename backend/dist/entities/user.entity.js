@@ -13,6 +13,7 @@ exports.User = void 0;
 const typeorm_1 = require("typeorm");
 const uuid_1 = require("uuid");
 const department_entity_1 = require("./department.entity");
+const team_entity_1 = require("../teams/entities/team.entity");
 let User = class User {
     generateId() {
         if (!this.id) {
@@ -60,9 +61,25 @@ __decorate([
     __metadata("design:type", Boolean)
 ], User.prototype, "isDepartmentAdmin", void 0);
 __decorate([
+    (0, typeorm_1.Column)({ name: 'isTeamMember', type: 'boolean', default: false }),
+    __metadata("design:type", Boolean)
+], User.prototype, "isTeamMember", void 0);
+__decorate([
     (0, typeorm_1.Column)({ name: 'isActive', type: 'boolean', default: true }),
     __metadata("design:type", Boolean)
 ], User.prototype, "isActive", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ name: 'isDeleted', type: 'boolean', default: false }),
+    __metadata("design:type", Boolean)
+], User.prototype, "isDeleted", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ name: 'hasDepartmentRights', type: 'boolean', default: false }),
+    __metadata("design:type", Boolean)
+], User.prototype, "hasDepartmentRights", void 0);
+__decorate([
+    (0, typeorm_1.Column)('json', { nullable: true }),
+    __metadata("design:type", Array)
+], User.prototype, "managedEquipmentTypes", void 0);
 __decorate([
     (0, typeorm_1.Column)({ nullable: true }),
     __metadata("design:type", Date)
@@ -76,6 +93,15 @@ __decorate([
     (0, typeorm_1.Column)({ nullable: true }),
     __metadata("design:type", String)
 ], User.prototype, "departmentId", void 0);
+__decorate([
+    (0, typeorm_1.ManyToOne)(() => team_entity_1.Team, { nullable: true, onDelete: 'SET NULL' }),
+    (0, typeorm_1.JoinColumn)({ name: 'teamId' }),
+    __metadata("design:type", team_entity_1.Team)
+], User.prototype, "team", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ nullable: true }),
+    __metadata("design:type", String)
+], User.prototype, "teamId", void 0);
 __decorate([
     (0, typeorm_1.CreateDateColumn)(),
     __metadata("design:type", Date)

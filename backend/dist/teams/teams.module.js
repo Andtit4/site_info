@@ -13,6 +13,8 @@ const teams_service_1 = require("./teams.service");
 const teams_controller_1 = require("./teams.controller");
 const team_entity_1 = require("./entities/team.entity");
 const departments_module_1 = require("../departments/departments.module");
+const users_module_1 = require("../users/users.module");
+const email_module_1 = require("../services/email.module");
 let TeamsModule = class TeamsModule {
 };
 exports.TeamsModule = TeamsModule;
@@ -21,6 +23,8 @@ exports.TeamsModule = TeamsModule = __decorate([
         imports: [
             typeorm_1.TypeOrmModule.forFeature([team_entity_1.Team]),
             departments_module_1.DepartmentsModule,
+            users_module_1.UsersModule,
+            email_module_1.EmailModule,
         ],
         controllers: [teams_controller_1.TeamsController],
         providers: [teams_service_1.TeamsService],

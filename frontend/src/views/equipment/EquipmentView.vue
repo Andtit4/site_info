@@ -46,11 +46,11 @@
             Tous les types
           </option>
           <option
-            v-for="type in equipmentTypes"
+            v-for="(label, type) in filteredEquipmentTypes"
             :key="type"
             :value="type"
           >
-            {{ getTypeLabel(type) }}
+            {{ label }}
           </option>
         </select>
         <select
@@ -155,6 +155,7 @@
               Voir
             </button>
             <button
+              v-if="canEditEquipment(equipment)"
               class="inline-flex items-center px-3 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
               @click="editEquipment(equipment)"
             >
@@ -558,7 +559,8 @@ import specificationsApi from '@/services/api/specificationsApi';
 import teamsApi from '@/services/api/teamsApi';
 import Modal from '@/components/Modal.vue';
 import { MagnifyingGlassIcon } from '@heroicons/vue/24/outline';
-// import axios from 'axios';
+import authService from '@/services/auth.service.js';
+// import { formatDate } from '@/utils/formatters.js';
 
 export default {
   name: 'EquipmentView',
@@ -635,15 +637,71 @@ export default {
       return teams.value.find(team => team.id === form.value.teamId);
     });
 
+    const filteredEquipmentTypes = computed(() => {
+      // Si c'est un admin, afficher tous les types
+      if (authService.isAdmin()) {
+        return equipmentTypes;
+      }
+      
+      // Pour un utilisateur de département, ne montrer que les types qu'il peut gérer
+      const user = authService.getCurrentUser();
+      if (user && user.managedEquipmentTypes && Array.isArray(user.managedEquipmentTypes)) {
+        const result = {};
+        user.managedEquipmentTypes.forEach(type => {
+          if (equipmentTypes.includes(type)) {
+            result[type] = getTypeLabel(type);
+          }
+        });
+        return result;
+      }
+      
+      return equipmentTypes;
+    });
+
     const filteredEquipment = computed(() => {
-      return equipment.value.filter(item => {
-        const matchesSearch = !filters.value.search || 
-          item.name.toLowerCase().includes(filters.value.search.toLowerCase()) ||
-          (item.serialNumber && item.serialNumber.toLowerCase().includes(filters.value.search.toLowerCase()));
-        const matchesType = !filters.value.type || item.type === filters.value.type;
-        const matchesStatus = !filters.value.status || item.status === filters.value.status;
-        return matchesSearch && matchesType && matchesStatus;
-      });
+      let result = equipment.value;
+      
+      // 1. Filtrer par recherche
+      if (filters.value.search) {
+        const search = filters.value.search.toLowerCase();
+        result = result.filter(
+          item =>
+            item.id.toLowerCase().includes(search) ||
+            item.model?.toLowerCase().includes(search) ||
+            item.manufacturer?.toLowerCase().includes(search) ||
+            item.serialNumber?.toLowerCase().includes(search)
+        );
+      }
+      
+      // 2. Filtrer par type
+      if (filters.value.type) {
+        result = result.filter(item => item.type === filters.value.type);
+      }
+      
+      // 3. Filtrer par statut
+      if (filters.value.status) {
+        result = result.filter(item => item.status === filters.value.status);
+      }
+      
+      // 4. Filtrer selon les droits de l'utilisateur (seulement pour les non-admins)
+      if (!authService.isAdmin()) {
+        const user = authService.getCurrentUser();
+        
+        // Si c'est un utilisateur avec des types d'équipements spécifiques
+        if (user && user.managedEquipmentTypes && Array.isArray(user.managedEquipmentTypes)) {
+          result = result.filter(item => user.managedEquipmentTypes.includes(item.type));
+        }
+        
+        // Si c'est un utilisateur de département
+        if (user && user.departmentId && user.hasDepartmentRights) {
+          result = result.filter(item => 
+            item.departmentId === user.departmentId || 
+            user.managedEquipmentTypes.includes(item.type)
+          );
+        }
+      }
+      
+      return result;
     });
 
     const loadSites = async () => {
@@ -946,6 +1004,40 @@ export default {
       toast.info('Données de débogage dans la console');
     };
 
+    const canEditEquipment = (equipment) => {
+      // Vérifier si l'utilisateur est administrateur (peut tout éditer)
+      if (authService.isAdmin()) {
+        return true;
+      }
+      
+      // Vérifier si l'utilisateur est administrateur de département
+      if (authService.isDepartmentAdmin()) {
+        const user = authService.getCurrentUser();
+        
+        // L'admin de département peut éditer un équipement s'il appartient à son département
+        if (user && user.departmentId && equipment.departmentId === user.departmentId) {
+          return true;
+        }
+      }
+      
+      // Vérifier si l'utilisateur a les droits du département
+      if (authService.hasDepartmentRights()) {
+        const user = authService.getCurrentUser();
+        
+        // Si l'équipement appartient au même département que l'utilisateur
+        if (user && user.departmentId && equipment.departmentId === user.departmentId) {
+          return true;
+        }
+      }
+      
+      // Vérifier si l'utilisateur peut gérer ce type d'équipement spécifique
+      if (equipment.type && authService.canManageEquipmentType(equipment.type)) {
+        return true;
+      }
+      
+      return false;
+    };
+
     onMounted(() => {
       loadEquipment();
       loadSites();
@@ -974,6 +1066,7 @@ export default {
       selectedEquipment,
       form,
       equipmentTypes,
+      filteredEquipmentTypes,
       equipmentStatuses,
       filteredEquipment,
       getTypeLabel,
@@ -998,6 +1091,7 @@ export default {
       watchTypeChange,
       handleSiteChange,
       debugFormData,
+      canEditEquipment,
     };
   },
 };

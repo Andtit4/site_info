@@ -91,6 +91,10 @@ __decorate([
     (0, typeorm_1.Column)({ default: () => 'CURRENT_TIMESTAMP', onUpdate: 'CURRENT_TIMESTAMP' }),
     __metadata("design:type", Date)
 ], Department.prototype, "updatedAt", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ default: false }),
+    __metadata("design:type", Boolean)
+], Department.prototype, "isDeleted", void 0);
 exports.Department = Department = __decorate([
     (0, typeorm_1.Entity)()
 ], Department);

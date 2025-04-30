@@ -71,6 +71,13 @@ const routes = [{
                 meta: { requiresAdmin: true }
             },
             {
+                path: 'users',
+                name: 'users',
+                component: () =>
+                    import ('@/views/users/UsersView.vue'),
+                meta: { requiresAdmin: true }
+            },
+            {
                 path: 'admin/create',
                 name: 'admin-create',
                 component: () =>
@@ -90,7 +97,7 @@ const router = createRouter({
     routes
 })
 
-// Navigation guard
+// guard
 router.beforeEach((to, from, next) => {
     const requiresAuth = to.matched.some(record => record.meta.requiresAuth)
     const requiresAdmin = to.matched.some(record => record.meta.requiresAdmin)

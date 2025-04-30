@@ -1,6 +1,7 @@
 import { Department } from '../../entities/department.entity';
 import { Site } from '../../entities/site.entity';
 import { Equipment } from '../../entities/equipment.entity';
+import { User } from '../../entities/user.entity';
 export declare enum TeamStatus {
     ACTIVE = "ACTIVE",
     STANDBY = "STANDBY",
@@ -21,6 +22,8 @@ export declare class Team {
     equipmentType: string;
     department: Department;
     departmentId: string;
+    users: User[];
     sites: Site[];
     equipment: Equipment[];
+    isDeleted: boolean;
 }

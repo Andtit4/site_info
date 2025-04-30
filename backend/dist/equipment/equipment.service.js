@@ -31,7 +31,8 @@ let EquipmentService = class EquipmentService {
         const { search, type, status, siteId, departmentId } = filterDto;
         const query = this.equipmentRepository.createQueryBuilder('equipment')
             .leftJoinAndSelect('equipment.site', 'site')
-            .leftJoinAndSelect('equipment.department', 'department');
+            .leftJoinAndSelect('equipment.department', 'department')
+            .where('equipment.isDeleted = :isDeleted', { isDeleted: false });
         if (search) {
             query.andWhere('(equipment.model LIKE :search OR equipment.manufacturer LIKE :search OR equipment.serialNumber LIKE :search)', { search: `%${search}%` });
         }
@@ -50,7 +51,9 @@ let EquipmentService = class EquipmentService {
         return query.getMany();
     }
     async findOne(id) {
-        const equipment = await this.equipmentRepository.findOne({ where: { id } });
+        const equipment = await this.equipmentRepository.findOne({
+            where: { id, isDeleted: false }
+        });
         if (!equipment) {
             throw new common_1.NotFoundException(`equipement avec ID ${id} non trouve`);
         }
@@ -65,7 +68,7 @@ let EquipmentService = class EquipmentService {
             await this.teamsService.findOne(createEquipmentDto.teamId);
         }
         const existingEquipment = await this.equipmentRepository.findOne({
-            where: { id: createEquipmentDto.id },
+            where: { id: createEquipmentDto.id, isDeleted: false },
         });
         if (existingEquipment) {
             throw new common_1.ConflictException(`Un equipement avec l'ID ${createEquipmentDto.id} existe dejà`);
@@ -88,24 +91,45 @@ let EquipmentService = class EquipmentService {
         return this.equipmentRepository.save(equipment);
     }
     async remove(id) {
-        const result = await this.equipmentRepository.delete(id);
-        if (result.affected === 0) {
-            throw new common_1.NotFoundException(`equipement avec ID ${id} non trouve`);
-        }
+        const equipment = await this.findOne(id);
+        equipment.isDeleted = true;
+        await this.equipmentRepository.save(equipment);
+    }
+    async removeBySiteId(siteId) {
+        const result = await this.equipmentRepository
+            .createQueryBuilder()
+            .update(equipment_entity_1.Equipment)
+            .set({ isDeleted: true })
+            .where("siteId = :siteId", { siteId })
+            .andWhere("isDeleted = :isDeleted", { isDeleted: false })
+            .execute();
+        return result.affected || 0;
+    }
+    async removeByDepartmentId(departmentId) {
+        const result = await this.equipmentRepository
+            .createQueryBuilder()
+            .update(equipment_entity_1.Equipment)
+            .set({ isDeleted: true })
+            .where("departmentId = :departmentId", { departmentId })
+            .andWhere("isDeleted = :isDeleted", { isDeleted: false })
+            .execute();
+        return result.affected || 0;
     }
     async getStatistics() {
-        const totalEquipment = await this.equipmentRepository.count();
+        const totalEquipment = await this.equipmentRepository.count({
+            where: { isDeleted: false }
+        });
         const typeCounts = {};
         for (const type in equipment_entity_1.EquipmentType) {
             const count = await this.equipmentRepository.count({
-                where: { name: equipment_entity_1.EquipmentType[type] },
+                where: { name: equipment_entity_1.EquipmentType[type], isDeleted: false },
             });
             typeCounts[equipment_entity_1.EquipmentType[type]] = count;
         }
         const statusCounts = {};
         for (const status in equipment_entity_1.EquipmentStatus) {
             const count = await this.equipmentRepository.count({
-                where: { status: equipment_entity_1.EquipmentStatus[status] },
+                where: { status: equipment_entity_1.EquipmentStatus[status], isDeleted: false },
             });
             statusCounts[equipment_entity_1.EquipmentStatus[status]] = count;
         }
@@ -120,7 +144,7 @@ let EquipmentService = class EquipmentService {
             throw new common_1.NotFoundException(`Type d'équipement ${type} invalide`);
         }
         return this.equipmentRepository.find({
-            where: { name: equipment_entity_1.EquipmentType[type] },
+            where: { name: equipment_entity_1.EquipmentType[type], isDeleted: false },
             relations: ['site', 'department'],
         });
     }

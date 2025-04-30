@@ -74,6 +74,9 @@ export class Equipment {
   @Column({ type: 'varchar', nullable: true })
   macAddress: string;
 
+  @Column({ name: 'isDeleted', type: 'boolean', default: false })
+  isDeleted: boolean;
+
   @ManyToOne(() => Site, site => site.equipment, {
     onDelete: 'CASCADE',
   })

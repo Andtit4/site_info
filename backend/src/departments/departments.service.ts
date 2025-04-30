@@ -113,7 +113,8 @@ export class DepartmentsService {
   async findAll(filterDto: DepartmentFilterDto = {}): Promise<Department[]> {
     try {
       const { type, isActive, search, managesEquipmentType } = filterDto;
-      const query = this.departmentsRepository.createQueryBuilder('department');
+      const query = this.departmentsRepository.createQueryBuilder('department')
+        .where('department.isDeleted = :isDeleted', { isDeleted: false });
 
       if (type) {
         query.andWhere('department.type = :type', { type });
@@ -148,8 +149,8 @@ export class DepartmentsService {
           'department.createdAt',
           'department.updatedAt'
         ])
-        .leftJoinAndSelect('department.equipment', 'equipment')
-        .leftJoinAndSelect('department.teams', 'teams');
+        .leftJoinAndSelect('department.equipment', 'equipment', 'equipment.isDeleted = :equipDeleted', { equipDeleted: false })
+        .leftJoinAndSelect('department.teams', 'teams', 'teams.isDeleted = :teamsDeleted', { teamsDeleted: false });
 
       const departments = await query.getMany();
       
@@ -173,10 +174,13 @@ export class DepartmentsService {
 
   async findOne(id: string): Promise<Department> {
     try {
-      const department = await this.departmentsRepository.findOne({
-        where: { id },
-        relations: ['equipment', 'teams'],
-      });
+      const departmentQuery = this.departmentsRepository.createQueryBuilder('department')
+        .where('department.id = :id', { id })
+        .andWhere('department.isDeleted = :isDeleted', { isDeleted: false })
+        .leftJoinAndSelect('department.equipment', 'equipment', 'equipment.isDeleted = :equipDeleted', { equipDeleted: false })
+        .leftJoinAndSelect('department.teams', 'teams', 'teams.isDeleted = :teamsDeleted', { teamsDeleted: false });
+
+      const department = await departmentQuery.getOne();
 
       if (!department) {
         throw new NotFoundException(`Département avec ID "${id}" non trouvé`);
@@ -246,12 +250,14 @@ export class DepartmentsService {
         throw new NotFoundException(`Département avec ID "${id}" non trouvé`);
       }
       
-      // Supprimer le département, même s'il contient des équipements ou des équipes
-      // La suppression sera propagée aux relations grâce aux contraintes de clé étrangère
-      // configurées avec cascade dans les entités
-      await this.departmentsRepository.delete(id);
+      // Soft delete - Marquer les utilisateurs liés à ce département comme supprimés
+      await this.usersService.deleteDepartmentUsers(id);
       
-      this.logger.log(`Département supprimé avec succès: ${department.name}`);
+      // Soft delete - Marquer le département comme supprimé
+      department.isDeleted = true;
+      await this.departmentsRepository.save(department);
+      
+      this.logger.log(`Département supprimé: ${department.name}`);
     } catch (error) {
       this.logger.error(`Erreur lors de la suppression du département ${id}: ${error.message}`, error.stack);
       throw error;

@@ -16,6 +16,8 @@ const equipment_entity_1 = require("../../entities/equipment.entity");
 class CreateTeamDto {
     constructor() {
         this.memberCount = 0;
+        this.createAccount = false;
+        this.hasDepartmentRights = false;
     }
 }
 exports.CreateTeamDto = CreateTeamDto;
@@ -70,10 +72,37 @@ __decorate([
     __metadata("design:type", String)
 ], CreateTeamDto.prototype, "equipmentType", void 0);
 __decorate([
+    (0, class_validator_1.IsArray)(),
+    (0, class_validator_1.IsEnum)(equipment_entity_1.EquipmentType, { each: true }),
+    (0, class_validator_1.IsOptional)(),
+    __metadata("design:type", Array)
+], CreateTeamDto.prototype, "equipmentTypes", void 0);
+__decorate([
     (0, class_validator_1.IsUUID)(),
     (0, class_validator_1.IsOptional)(),
     __metadata("design:type", String)
 ], CreateTeamDto.prototype, "departmentId", void 0);
+__decorate([
+    (0, class_validator_1.IsBoolean)(),
+    (0, class_validator_1.IsOptional)(),
+    __metadata("design:type", Boolean)
+], CreateTeamDto.prototype, "createAccount", void 0);
+__decorate([
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.MinLength)(8, { message: 'Le mot de passe doit contenir au moins 8 caractères' }),
+    __metadata("design:type", String)
+], CreateTeamDto.prototype, "password", void 0);
+__decorate([
+    (0, class_validator_1.IsEmail)(),
+    (0, class_validator_1.IsOptional)(),
+    __metadata("design:type", String)
+], CreateTeamDto.prototype, "userEmail", void 0);
+__decorate([
+    (0, class_validator_1.IsBoolean)(),
+    (0, class_validator_1.IsOptional)(),
+    __metadata("design:type", Boolean)
+], CreateTeamDto.prototype, "hasDepartmentRights", void 0);
 class UpdateTeamDto {
 }
 exports.UpdateTeamDto = UpdateTeamDto;
@@ -127,6 +156,12 @@ __decorate([
     (0, class_validator_1.IsOptional)(),
     __metadata("design:type", String)
 ], UpdateTeamDto.prototype, "equipmentType", void 0);
+__decorate([
+    (0, class_validator_1.IsArray)(),
+    (0, class_validator_1.IsEnum)(equipment_entity_1.EquipmentType, { each: true }),
+    (0, class_validator_1.IsOptional)(),
+    __metadata("design:type", Array)
+], UpdateTeamDto.prototype, "equipmentTypes", void 0);
 __decorate([
     (0, class_validator_1.IsUUID)(),
     (0, class_validator_1.IsOptional)(),
